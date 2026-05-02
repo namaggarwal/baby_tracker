@@ -146,6 +146,57 @@ export default function Settings() {
       </section>
       
       <section className="settings-section">
+        <h3>Daily Goals</h3>
+        <div className="setting-item">
+          <label>Tummy Time Goal (Minutes)</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px' }}>
+            <input 
+              type="range" 
+              min="5" 
+              max="120" 
+              step="5"
+              value={settings?.tummyGoal || 30} 
+              onChange={(e) => updateSetting('tummyGoal', parseInt(e.target.value))}
+              style={{ flex: 1, accentColor: 'var(--color-primary)' }}
+            />
+            <span style={{ minWidth: '45px', fontWeight: '700', color: 'var(--color-primary)' }}>{settings?.tummyGoal || 30}m</span>
+          </div>
+        </div>
+
+        <div className="setting-item">
+          <label>Feeding Goal (Number of feeds)</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px' }}>
+            <input 
+              type="range" 
+              min="1" 
+              max="15" 
+              step="1"
+              value={settings?.feedGoal || 8} 
+              onChange={(e) => updateSetting('feedGoal', parseInt(e.target.value))}
+              style={{ flex: 1, accentColor: 'var(--color-primary)' }}
+            />
+            <span style={{ minWidth: '45px', fontWeight: '700', color: 'var(--color-primary)' }}>{settings?.feedGoal || 8}</span>
+          </div>
+        </div>
+
+        <div className="setting-item">
+          <label>Nappy Change Goal (Number of changes)</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px' }}>
+            <input 
+              type="range" 
+              min="1" 
+              max="15" 
+              step="1"
+              value={settings?.nappyGoal || 6} 
+              onChange={(e) => updateSetting('nappyGoal', parseInt(e.target.value))}
+              style={{ flex: 1, accentColor: 'var(--color-primary)' }}
+            />
+            <span style={{ minWidth: '45px', fontWeight: '700', color: 'var(--color-primary)' }}>{settings?.nappyGoal || 6}</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="settings-section">
         <h3>Data & Sync</h3>
         <div className="setting-item">
           <label>Google Sheets Sync</label>

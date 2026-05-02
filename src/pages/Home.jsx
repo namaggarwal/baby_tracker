@@ -63,8 +63,23 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [isSleeping, lastSleep]);
 
+  // Daily Progress Calculations
+  const today = new Date().toDateString();
+  const todayEvents = events?.filter(e => new Date(e.timestamp).toDateString() === today) || [];
+
+  const tummyMins = todayEvents
+    .filter(e => e.type === 'tummy')
+    .reduce((acc, e) => acc + (parseInt(e.duration) || 0), 0);
+  
+  const feedCount = todayEvents.filter(e => e.type === 'feed').length;
+  const diaperCount = todayEvents.filter(e => e.type === 'diaper').length;
+
+  const tummyGoal = settings?.tummyGoal || 30;
+  const feedGoal = settings?.feedGoal || 8;
+  const nappyGoal = settings?.nappyGoal || 6;
+
   // Simple ring component for daily progress
-  const ProgressRing = ({ value, max, label, color }) => {
+  const ProgressRing = ({ value, max, label, color, unit }) => {
     const radius = 28;
     const circumference = 2 * Math.PI * radius;
     const safeValue = Math.min(value, max);
@@ -80,7 +95,7 @@ export default function Home() {
           </svg>
           <div className="progress-value">
             <span className="current">{value}</span>
-            <span className="max">/ {max}{label.includes('Time') ? 'M' : ' FEEDS'}</span>
+            <span className="max">/ {max}{unit}</span>
           </div>
         </div>
         <div className="progress-label">{label}</div>
@@ -167,8 +182,9 @@ export default function Home() {
       <section className="daily-progress">
         <h3 className="section-title">Daily Progress</h3>
         <div className="rings-container">
-          <ProgressRing value={15} max={30} label="Tummy Time" color="#2e4e30" />
-          <ProgressRing value={4} max={8} label="Daily Feeds" color="#494265" />
+          <ProgressRing value={tummyMins} max={tummyGoal} label="Tummy Time" color="#2e4e30" unit="M" />
+          <ProgressRing value={feedCount} max={feedGoal} label="Feeds" color="#494265" unit="" />
+          <ProgressRing value={diaperCount} max={nappyGoal} label="Nappies" color="#c2b280" unit="" />
         </div>
       </section>
 
