@@ -1,5 +1,15 @@
-.modal-overlay {
+.sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
   justify-content: flex-end;
+  z-index: 1000;
 }
 
 .quick-add-sheet {
@@ -7,11 +17,9 @@
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
   padding: 32px 24px;
-  padding-bottom: calc(100px + env(safe-area-inset-bottom)); /* Leave space for FAB */
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 -8px 32px rgba(0,0,0,0.05);
-  margin: 0 16px;
-  margin-bottom: -40px; /* pull down behind the nav area */
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.1);
 }
 
 .sheet-header {

@@ -29,7 +29,7 @@ export default function QuickAddMenu({ onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="sheet-overlay" onClick={onClose}>
       <div className="quick-add-sheet" onClick={e => e.stopPropagation()}>
         <div className="sheet-header">
           <h3>Quick Log</h3>
