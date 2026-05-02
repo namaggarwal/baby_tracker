@@ -1,14 +1,41 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import QuickAddMenu from './QuickAddMenu';
+import { useToast } from '../context/ToastContext';
 import './AppShell.css';
 
 export default function AppShell() {
   const location = useLocation();
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOffline(false);
+      showToast('Back online! All set.', 'success');
+    };
+    const handleOffline = () => {
+      setIsOffline(true);
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [showToast]);
 
   return (
     <div className="app-container">
+      {isOffline && (
+        <div className="offline-banner">
+          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>cloud_off</span>
+          Offline Mode • Working Locally
+        </div>
+      )}
       <main className="main-content">
         <Outlet />
       </main>
