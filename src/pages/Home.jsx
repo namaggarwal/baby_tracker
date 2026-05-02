@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +8,38 @@ export default function Home() {
   const navigate = useNavigate();
   const events = useEvents();
   const { settings } = useSettings();
-  const babyName = settings?.babyName || 'Tara'; // Matching mockup default
+  const babyName = settings?.babyName || 'Tara';
+
+  const [elapsedTime, setElapsedTime] = useState('00:00:00');
+  const lastSleep = events?.find(e => e.type === 'sleep');
+  const isSleeping = lastSleep && !lastSleep.endTime;
+
+  const sleepsToday = events?.filter(e => 
+    e.type === 'sleep' && 
+    new Date(e.timestamp).toLocaleDateString() === new Date().toLocaleDateString()
+  ).length || 0;
+
+  useEffect(() => {
+    const updateTimer = () => {
+      const referenceTime = isSleeping 
+        ? new Date(lastSleep.timestamp) 
+        : (lastSleep?.endTime ? new Date(lastSleep.endTime) : null);
+
+      if (referenceTime) {
+        const diff = Math.abs(new Date() - referenceTime);
+        const hrs = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+        const secs = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+        setElapsedTime(`${hrs}:${mins}:${secs}`);
+      } else {
+        setElapsedTime('00:00:00');
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [isSleeping, lastSleep]);
 
   // Simple ring component for daily progress
   const ProgressRing = ({ value, max, label, color }) => {
@@ -47,20 +79,34 @@ export default function Home() {
       </header>
 
       {/* Current Status Card */}
-      <section className="status-card">
+      <section className={`status-card ${isSleeping ? 'is-sleeping' : 'is-awake'}`}>
         <div className="status-top">
           <div className="status-main">
-            <div className="status-icon"><span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#494265' }}>bedtime</span></div>
+            <div className="status-icon">
+              <span className="material-symbols-outlined material-icons-filled" style={{ 
+                fontSize: '24px', 
+                color: isSleeping ? '#494265' : '#2e4e30' 
+              }}>
+                {isSleeping ? 'bedtime' : 'sunny'}
+              </span>
+            </div>
             <div className="status-text">
               <span className="status-subtitle">Current Status</span>
-              <span className="status-title">{babyName} is sleeping</span>
+              <span className="status-title">{babyName} is {isSleeping ? 'sleeping' : 'awake'}</span>
             </div>
           </div>
-          <div className="status-timer">01:42:15</div>
+          <div className="status-timer">{elapsedTime}</div>
         </div>
         <div className="status-footer">
-          <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#625a7f' }}>history</span>
-          <span>Started at 1:45 PM • Nap 2 of the day</span>
+          <span className="material-symbols-outlined" style={{ 
+            fontSize: '16px', 
+            color: isSleeping ? '#625a7f' : '#424841' 
+          }}>history</span>
+          {isSleeping ? (
+            <span>Started at {new Date(lastSleep.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • Nap {sleepsToday} of the day</span>
+          ) : (
+            <span>{lastSleep ? `Woke up at ${new Date(lastSleep.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'No sleep records yet'}</span>
+          )}
         </div>
       </section>
 

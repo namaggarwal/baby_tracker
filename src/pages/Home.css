@@ -45,8 +45,15 @@
   border-radius: 32px;
   padding: 24px;
   margin-bottom: 24px;
+  transition: background-color 0.3s ease;
+}
+
+.status-card.is-sleeping {
   background: #f2ebfa; /* Light lavender */
-  box-shadow: none;
+}
+
+.status-card.is-awake {
+  background: #f1f4f0; /* Light sage */
 }
 
 .status-top {
@@ -97,6 +104,16 @@
   color: #494265;
   font-family: inherit;
   letter-spacing: 0.5px;
+}
+
+.status-card.is-awake .status-title,
+.status-card.is-awake .status-timer {
+  color: #2e4e30;
+}
+
+.status-card.is-awake .status-subtitle,
+.status-card.is-awake .status-footer {
+  color: #424841;
 }
 
 .status-footer {
