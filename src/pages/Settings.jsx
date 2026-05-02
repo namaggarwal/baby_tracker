@@ -56,6 +56,24 @@ export default function Settings() {
             )}
           </div>
         </div>
+
+        <div className="setting-item">
+          <label>Time Format</label>
+          <div className="segment-control settings-segment">
+            <button 
+              className={`segment-btn ${settings?.timeFormat !== '12h' ? 'active' : ''}`}
+              onClick={() => updateSetting('timeFormat', '24h')}
+            >
+              24 Hours
+            </button>
+            <button 
+              className={`segment-btn ${settings?.timeFormat === '12h' ? 'active' : ''}`}
+              onClick={() => updateSetting('timeFormat', '12h')}
+            >
+              12 Hours
+            </button>
+          </div>
+        </div>
       </section>
       
       <section className="settings-section">

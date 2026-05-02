@@ -1,8 +1,31 @@
-import { useEvents } from '../hooks/useEvents';
+import { useState } from 'react';
+import { useEvents, deleteEvent } from '../hooks/useEvents';
+import { useSettings } from '../hooks/useSettings';
+import { formatTime, formatTimeRange } from '../utils/timeFormat';
+import ConfirmModal from '../components/ConfirmModal';
 import './History.css';
 
 export default function History() {
   const events = useEvents();
+  const { settings } = useSettings();
+  const [deleteEventObj, setDeleteEventObj] = useState(null);
+
+  const handleConfirmDelete = async () => {
+    if (deleteEventObj) {
+      await deleteEvent(deleteEventObj.id);
+      setDeleteEventObj(null);
+    }
+  };
+
+  const getDeleteMessage = (event) => {
+    if (!event) return '';
+    const time = formatTime(event.timestamp, settings?.timeFormat);
+    let details = '';
+    if (event.type === 'feed') details = ` (${event.subtype} ${event.quantity_ml}ml)`;
+    if (event.type === 'medicine') details = ` (${event.subtype} ${event.dosage})`;
+    if (event.type === 'diaper') details = ` (${event.subtype || 'wet'})`;
+    return `Are you sure you want to delete the ${event.type} log from ${time}${details}? This action cannot be undone.`;
+  };
 
   // Group events by date
   const groupedEvents = events?.reduce((acc, event) => {
@@ -26,7 +49,7 @@ export default function History() {
               {groupedEvents[date].map(event => (
                 <div key={event.id} className="timeline-item">
                   <div className="timeline-time">
-                    {new Date(event.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    {formatTime(event.timestamp, settings?.timeFormat)}
                   </div>
                   <div className="timeline-dot-container">
                     <div className="timeline-line"></div>
@@ -44,17 +67,22 @@ export default function History() {
                     </div>
                   </div>
                   <div className="timeline-content glass">
-                    <div className="content-title">
-                      {event.type === 'feed' 
-                        ? (event.subtype === 'breast' ? 'Breast Feed' : 'Formula Feed') 
-                        : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : 
-                          event.type === 'medicine' ? `Medicine: ${event.subtype}` :
-                          event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                    <div className="content-header">
+                      <div className="content-title">
+                        {event.type === 'feed' 
+                          ? (event.subtype === 'breast' ? 'Breast Feed' : 'Formula Feed') 
+                          : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : 
+                            event.type === 'medicine' ? `Medicine: ${event.subtype}` :
+                            event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                      </div>
+                      <button className="delete-log-btn" onClick={() => setDeleteEventObj(event)}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+                      </button>
                     </div>
                     <div className="content-details">
                       {event.type === 'sleep' ? (
                         <>
-                          <span>{new Date(event.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {event.endTime ? new Date(event.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ongoing'}</span>
+                          <span>{formatTimeRange(event.timestamp, event.endTime, settings?.timeFormat)}</span>
                           {event.duration && <span style={{ opacity: 0.8 }}> • {event.duration}</span>}
                           {event.notes && <div style={{ fontStyle: 'italic', marginTop: '4px', opacity: 0.8 }}>"{event.notes}"</div>}
                         </>
@@ -96,6 +124,13 @@ export default function History() {
           </div>
         )}
       </div>
+
+      <ConfirmModal 
+        isOpen={deleteEventObj !== null} 
+        onClose={() => setDeleteEventObj(null)} 
+        onConfirm={handleConfirmDelete} 
+        message={getDeleteMessage(deleteEventObj)}
+      />
     </div>
   );
 }

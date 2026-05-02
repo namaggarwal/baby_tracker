@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
 import { useNavigate } from 'react-router-dom';
+import { formatTime, formatTimeRange } from '../utils/timeFormat';
 import './Home.css';
 
 export default function Home() {
@@ -160,9 +161,9 @@ export default function Home() {
                  </span>
                  <span className="activity-time">
                    {event.type === 'sleep' ? (
-                     `${new Date(event.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${event.endTime ? new Date(event.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ongoing'}`
+                     formatTimeRange(event.timestamp, event.endTime, settings?.timeFormat)
                    ) : (
-                     new Date(event.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                     formatTime(event.timestamp, settings?.timeFormat)
                    )}
                    {event.type !== 'sleep' && ` • ${
                      event.type === 'feed' ? `${event.quantity_ml}ml ${event.subtype === 'breast' ? 'Breastmilk' : 'Formula'}` 
