@@ -146,6 +146,7 @@ export default function Home() {
                  {event.type === 'feed' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#436444' }}>nutrition</span>}
                  {event.type === 'sleep' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#61597e' }}>bedtime</span>}
                  {event.type === 'diaper' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#5d5c55' }}>water_drop</span>}
+                 {event.type === 'medicine' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#ba1a1a' }}>medical_services</span>}
                  {event.type === 'tummy' && <span className="material-symbols-outlined" style={{ fontSize: '24px', color: '#5d5c55' }}>face</span>}
                  {event.type === 'bath' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#5d5c55' }}>bathtub</span>}
                </div>
@@ -153,7 +154,9 @@ export default function Home() {
                  <span className="activity-name">
                    {event.type === 'feed' 
                      ? (event.subtype === 'breast' ? 'Breast Feed' : 'Formula Feed') 
-                     : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                     : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : 
+                       event.type === 'medicine' ? `Medicine: ${event.subtype}` :
+                       event.type.charAt(0).toUpperCase() + event.type.slice(1)}
                  </span>
                  <span className="activity-time">
                    {event.type === 'sleep' ? (
@@ -164,6 +167,7 @@ export default function Home() {
                    {event.type !== 'sleep' && ` • ${
                      event.type === 'feed' ? `${event.quantity_ml}ml ${event.subtype === 'breast' ? 'Breastmilk' : 'Formula'}` 
                      : event.type === 'diaper' ? (event.size ? `${event.size === 'S' ? 'Small' : event.size === 'M' ? 'Medium' : 'Large'}` : 'Normal')
+                     : event.type === 'medicine' ? event.dosage
                      : 'Normal'
                    }`}
                    {event.type === 'sleep' && event.duration && ` • ${event.duration}`}

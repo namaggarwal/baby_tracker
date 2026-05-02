@@ -38,6 +38,7 @@ export default function History() {
                       {event.type === 'feed' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '16px', color: '#fff' }}>nutrition</span>}
                       {event.type === 'sleep' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '16px', color: '#fff' }}>bedtime</span>}
                       {event.type === 'diaper' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '16px', color: '#fff' }}>water_drop</span>}
+                      {event.type === 'medicine' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '16px', color: '#fff' }}>medical_services</span>}
                       {event.type === 'bath' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '16px', color: '#fff' }}>bathtub</span>}
                       {event.type === 'tummy' && <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#fff' }}>face</span>}
                     </div>
@@ -46,7 +47,9 @@ export default function History() {
                     <div className="content-title">
                       {event.type === 'feed' 
                         ? (event.subtype === 'breast' ? 'Breast Feed' : 'Formula Feed') 
-                        : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                        : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : 
+                          event.type === 'medicine' ? `Medicine: ${event.subtype}` :
+                          event.type.charAt(0).toUpperCase() + event.type.slice(1)}
                     </div>
                     <div className="content-details">
                       {event.type === 'sleep' ? (
@@ -66,6 +69,11 @@ export default function History() {
                       ) : event.type === 'diaper' ? (
                         <>
                           <span>{event.size ? `${event.size === 'S' ? 'Small' : event.size === 'M' ? 'Medium' : 'Large'}` : 'Normal'}</span>
+                          {event.notes && <div style={{ fontStyle: 'italic', marginTop: '4px', opacity: 0.8 }}>"{event.notes}"</div>}
+                        </>
+                      ) : event.type === 'medicine' ? (
+                        <>
+                          <span>Dosage: {event.dosage}</span>
                           {event.notes && <div style={{ fontStyle: 'italic', marginTop: '4px', opacity: 0.8 }}>"{event.notes}"</div>}
                         </>
                       ) : (

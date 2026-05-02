@@ -8,6 +8,7 @@ export default function QuickAddMenu({ onClose }) {
     { id: 'feed', icon: 'baby_changing_station', label: 'Feeding', color: 'rgba(67, 100, 68, 0.1)' },
     { id: 'sleep', icon: 'bedtime', label: 'Sleep', color: 'rgba(97, 89, 126, 0.2)' },
     { id: 'diaper', icon: 'layers', label: 'Nappy', color: 'rgba(93, 92, 85, 0.1)' },
+    { id: 'medicine', icon: 'medical_services', label: 'Medicine', color: 'rgba(186, 26, 26, 0.1)' },
     { id: 'tummy', icon: 'child_care', label: 'Tummy', color: 'rgba(159, 168, 163, 0.2)' },
     { id: 'bath', icon: 'bathtub', label: 'Bath', color: 'rgba(203, 240, 204, 0.5)' },
   ];
@@ -20,6 +21,8 @@ export default function QuickAddMenu({ onClose }) {
       navigate('/log/nappy');
     } else if (actionId === 'sleep') {
       navigate('/log/sleep');
+    } else if (actionId === 'medicine') {
+      navigate('/log/medicine');
     } else {
       await addEvent({ type: actionId });
     }
