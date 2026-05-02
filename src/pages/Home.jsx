@@ -110,11 +110,17 @@ export default function Home() {
                      : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : event.type.charAt(0).toUpperCase() + event.type.slice(1)}
                  </span>
                  <span className="activity-time">
-                   {new Date(event.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • {
+                   {event.type === 'sleep' ? (
+                     `${new Date(event.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${event.endTime ? new Date(event.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ongoing'}`
+                   ) : (
+                     new Date(event.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                   )}
+                   {event.type !== 'sleep' && ` • ${
                      event.type === 'feed' ? `${event.quantity_ml}ml ${event.subtype === 'breast' ? 'Breastmilk' : 'Formula'}` 
                      : event.type === 'diaper' ? (event.size ? `${event.size === 'S' ? 'Small' : event.size === 'M' ? 'Medium' : 'Large'}` : 'Normal')
                      : 'Normal'
-                   }
+                   }`}
+                   {event.type === 'sleep' && event.duration && ` • ${event.duration}`}
                  </span>
                </div>
             </div>

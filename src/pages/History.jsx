@@ -49,7 +49,13 @@ export default function History() {
                         : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : event.type.charAt(0).toUpperCase() + event.type.slice(1)}
                     </div>
                     <div className="content-details">
-                      {event.type === 'feed' ? (
+                      {event.type === 'sleep' ? (
+                        <>
+                          <span>{new Date(event.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {event.endTime ? new Date(event.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ongoing'}</span>
+                          {event.duration && <span style={{ opacity: 0.8 }}> • {event.duration}</span>}
+                          {event.notes && <div style={{ fontStyle: 'italic', marginTop: '4px', opacity: 0.8 }}>"{event.notes}"</div>}
+                        </>
+                      ) : event.type === 'feed' ? (
                         <>
                           <span>{event.quantity_ml ? `${event.quantity_ml}ml ` : ''}{event.subtype === 'breast' ? 'Breastmilk' : 'Formula'}</span>
                           {event.subtype === 'breast' && event.side && (
