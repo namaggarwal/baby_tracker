@@ -119,26 +119,10 @@ export default function Home() {
                </div>
             </div>
           )) : (
-            <>
-              <div className="activity-item">
-                 <div className="activity-icon-container">
-                   <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#5d5c55' }}>water_drop</span>
-                 </div>
-                 <div className="activity-details">
-                   <span className="activity-name">Wet Diaper</span>
-                   <span className="activity-time">12:45 PM • Normal</span>
-                 </div>
-              </div>
-              <div className="activity-item">
-                 <div className="activity-icon-container">
-                   <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#436444' }}>nutrition</span>
-                 </div>
-                 <div className="activity-details">
-                   <span className="activity-name">Bottle Feed</span>
-                   <span className="activity-time">11:30 AM • 120ml Breastmilk</span>
-                 </div>
-              </div>
-            </>
+            <div className="empty-recent">
+              <span className="material-symbols-outlined" style={{ fontSize: '40px', opacity: 0.3 }}>event_busy</span>
+              <p>No recent activity. Use the + button to log something!</p>
+            </div>
           )}
         </div>
       </section>

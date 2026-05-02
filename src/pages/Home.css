@@ -276,3 +276,24 @@
   font-size: 14px;
   color: #424841;
 }
+
+.empty-recent {
+  background: rgba(255, 255, 255, 0.4);
+  border: 2px dashed #d8dbd6;
+  border-radius: 40px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.empty-recent p {
+  font-size: 14px;
+  color: #424841;
+  margin: 0;
+  max-width: 200px;
+  line-height: 1.4;
+}

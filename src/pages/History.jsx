@@ -73,7 +73,13 @@ export default function History() {
           </div>
         ))}
         {(!events || events.length === 0) && (
-          <div className="empty-state">No history recorded yet</div>
+          <div className="empty-state">
+            <div className="empty-icon-container">
+              <span className="material-symbols-outlined" style={{ fontSize: '64px' }}>history_toggle_off</span>
+            </div>
+            <h3>No activities yet</h3>
+            <p>Your baby's journey starts here. Log your first activity to see it in the timeline.</p>
+          </div>
         )}
       </div>
     </div>

@@ -83,3 +83,39 @@
   font-size: 14px;
   color: var(--color-on-surface-variant);
 }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--color-on-surface-variant);
+}
+
+.empty-icon-container {
+  width: 120px;
+  height: 120px;
+  background: var(--color-surface-container);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  color: var(--color-primary);
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: var(--color-on-surface);
+}
+
+.empty-state p {
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 280px;
+  margin: 0 auto;
+}
