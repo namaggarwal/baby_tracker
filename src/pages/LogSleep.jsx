@@ -1,35 +1,42 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addEvent } from '../hooks/useEvents';
+import { addEvent, useEvents, updateEvent } from '../hooks/useEvents';
 import './LogSleep.css';
 
 export default function LogSleep() {
   const navigate = useNavigate();
   const startTimeRef = useRef(null);
   const endTimeRef = useRef(null);
-
-  const [startTime, setStartTime] = useState(() => {
-    const now = new Date();
-    now.setHours(now.getHours() - 2);
-    return now.toTimeString().slice(0, 5);
-  });
   
-  const [endTime, setEndTime] = useState(() => {
-    const now = new Date();
-    return now.toTimeString().slice(0, 5);
-  });
-  const [notes, setNotes] = useState('');
+  const sleepEvents = useEvents('sleep');
+  const activeSleep = sleepEvents?.find(e => !e.endTime);
 
-  // Calculate duration
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [notes, setNotes] = useState('');
   const [duration, setDuration] = useState('0h 0m');
 
+  // Initialize from active sleep or current time
+  useEffect(() => {
+    const now = new Date();
+    if (activeSleep) {
+      const startDt = new Date(activeSleep.timestamp);
+      setStartTime(startDt.toTimeString().slice(0, 5));
+      setEndTime(now.toTimeString().slice(0, 5));
+      setNotes(activeSleep.notes || '');
+    } else {
+      setStartTime(now.toTimeString().slice(0, 5));
+      setEndTime(now.toTimeString().slice(0, 5));
+    }
+  }, [activeSleep]);
+
+  // Calculate duration
   useEffect(() => {
     if (startTime && endTime) {
       const start = new Date(`2000-01-01T${startTime}`);
       let end = new Date(`2000-01-01T${endTime}`);
       
       if (end < start) {
-         // Assume it crossed midnight
          end.setDate(end.getDate() + 1);
       }
       const diffMs = end - start;
@@ -39,10 +46,10 @@ export default function LogSleep() {
     }
   }, [startTime, endTime]);
 
-  const displayStart = new Date(`2000-01-01T${startTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const displayEnd = new Date(`2000-01-01T${endTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const displayStart = startTime ? new Date(`2000-01-01T${startTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+  const displayEnd = endTime ? new Date(`2000-01-01T${endTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
 
-  const handleEndSleep = () => {
+  const handleSnapToEnd = () => {
     const now = new Date();
     setEndTime(now.toTimeString().slice(0, 5));
   };
@@ -53,22 +60,29 @@ export default function LogSleep() {
     const startDt = new Date(now);
     startDt.setHours(parseInt(startH, 10), parseInt(startM, 10), 0, 0);
 
-    const [endH, endM] = endTime.split(':');
-    const endDt = new Date(now);
-    endDt.setHours(parseInt(endH, 10), parseInt(endM, 10), 0, 0);
+    if (activeSleep) {
+      // Ending an existing sleep
+      const [endH, endM] = endTime.split(':');
+      const endDt = new Date(now);
+      endDt.setHours(parseInt(endH, 10), parseInt(endM, 10), 0, 0);
+      if (endDt < startDt) endDt.setDate(endDt.getDate() + 1);
 
-    if (endDt < startDt) {
-      startDt.setDate(startDt.getDate() - 1);
+      await updateEvent(activeSleep.id, {
+        timestamp: startDt.toISOString(), // Allow updating start time if edited
+        endTime: endDt.toISOString(),
+        duration,
+        notes
+      });
+    } else {
+      // Starting a new sleep
+      const eventData = {
+        type: 'sleep',
+        timestamp: startDt.toISOString(),
+        endTime: null, // Keep it open
+        notes,
+      };
+      await addEvent(eventData);
     }
-
-    const eventData = {
-      type: 'sleep',
-      timestamp: startDt.toISOString(),
-      endTime: endDt.toISOString(),
-      duration,
-      notes,
-    };
-    await addEvent(eventData);
     navigate('/');
   };
 
@@ -78,7 +92,7 @@ export default function LogSleep() {
         <button className="icon-btn" onClick={() => navigate(-1)}>
           <span className="material-symbols-outlined" style={{ fontSize: '24px', color: '#012108' }}>arrow_back</span>
         </button>
-        <h2>Log Sleep</h2>
+        <h2>{activeSleep ? 'End Sleep' : 'Start Sleep'}</h2>
         <button className="icon-btn">
           <span className="material-symbols-outlined" style={{ fontSize: '24px', color: '#012108' }}>notifications</span>
         </button>
@@ -89,20 +103,25 @@ export default function LogSleep() {
         <div className="timer-section">
           <div className="timer-circle">
             <span className="timer-label">Duration</span>
-            <span className="timer-value">{duration}</span>
+            <span className="timer-value">{activeSleep ? duration : '--'}</span>
             <div className="moon-bg">
                <span className="material-symbols-outlined" style={{ fontSize: '120px', opacity: 0.05 }}>bedtime</span>
             </div>
           </div>
-          <div className="timer-status">Currently resting since {displayStart}</div>
-          <button className="end-sleep-btn" onClick={handleEndSleep}>
-            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>stop_circle</span> End Sleep
-          </button>
+          <div className="timer-status">
+            {activeSleep ? `Currently resting since ${displayStart}` : 'Not currently tracking'}
+          </div>
+          
+          {activeSleep && (
+            <button className="end-sleep-btn" onClick={handleSnapToEnd}>
+              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>schedule</span> Snap to Current Time
+            </button>
+          )}
         </div>
 
         {/* Manual Entry */}
         <div className="manual-entry-card">
-          <h3 className="card-title">Manual Entry</h3>
+          <h3 className="card-title">Entry Details</h3>
           
           <div className="time-row">
             <div className="time-col">
@@ -119,20 +138,23 @@ export default function LogSleep() {
                 />
               </div>
             </div>
-            <div className="time-col">
-              <span className="col-label">End Time</span>
-              <div className="time-input-container" onClick={() => endTimeRef.current?.showPicker && endTimeRef.current.showPicker()}>
-                <span className="display-time">{displayEnd}</span>
-                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>schedule</span>
-                <input 
-                  type="time" 
-                  ref={endTimeRef} 
-                  value={endTime} 
-                  onChange={(e) => setEndTime(e.target.value)} 
-                  className="hidden-time-input"
-                />
+            
+            {activeSleep && (
+              <div className="time-col">
+                <span className="col-label">End Time</span>
+                <div className="time-input-container" onClick={() => endTimeRef.current?.showPicker && endTimeRef.current.showPicker()}>
+                  <span className="display-time">{displayEnd}</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>schedule</span>
+                  <input 
+                    type="time" 
+                    ref={endTimeRef} 
+                    value={endTime} 
+                    onChange={(e) => setEndTime(e.target.value)} 
+                    className="hidden-time-input"
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="notes-col">
@@ -144,20 +166,12 @@ export default function LogSleep() {
             ></textarea>
           </div>
         </div>
-
-        {/* Info Card */}
-        <div className="info-card">
-          <img src="https://images.unsplash.com/photo-1544281665-c9945a8053a4?auto=format&fit=crop&w=400&q=80" alt="Sleeping baby" className="info-img" />
-          <div className="info-overlay">
-             <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#fff' }}>info</span>
-             <span>Consistency helps baby develop routines</span>
-          </div>
-        </div>
       </div>
 
       <div className="bottom-action-bar">
         <button className="save-btn" onClick={handleSave}>
-          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>save</span> Save Record
+          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{activeSleep ? 'stop_circle' : 'play_circle'}</span> 
+          {activeSleep ? 'Save & End Sleep' : 'Start Sleep Record'}
         </button>
       </div>
     </div>
