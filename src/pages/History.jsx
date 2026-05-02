@@ -3,6 +3,7 @@ import { useEvents, deleteEvent } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
 import { formatTime, formatTimeRange } from '../utils/timeFormat';
 import ConfirmModal from '../components/ConfirmModal';
+import SwipeableItem from '../components/SwipeableItem';
 import './History.css';
 
 export default function History() {
@@ -66,20 +67,18 @@ export default function History() {
                       {event.type === 'tummy' && <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#fff' }}>face</span>}
                     </div>
                   </div>
-                  <div className="timeline-content glass">
-                    <div className="content-header">
-                      <div className="content-title">
-                        {event.type === 'feed' 
-                          ? (event.subtype === 'breast' ? 'Breast Feed' : 'Formula Feed') 
-                          : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : 
-                            event.type === 'medicine' ? `Medicine: ${event.subtype}` :
-                            event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                  <SwipeableItem onDelete={() => setDeleteEventObj(event)}>
+                    <div className="timeline-content glass">
+                      <div className="content-header">
+                        <div className="content-title">
+                          {event.type === 'feed' 
+                            ? (event.subtype === 'breast' ? 'Breast Feed' : 'Formula Feed') 
+                            : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : 
+                              event.type === 'medicine' ? `Medicine: ${event.subtype}` :
+                              event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                        </div>
                       </div>
-                      <button className="delete-log-btn" onClick={() => setDeleteEventObj(event)}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
-                      </button>
-                    </div>
-                    <div className="content-details">
+                      <div className="content-details">
                       {event.type === 'sleep' ? (
                         <>
                           <span>{formatTimeRange(event.timestamp, event.endTime, settings?.timeFormat)}</span>
@@ -109,7 +108,8 @@ export default function History() {
                       )}
                     </div>
                   </div>
-                </div>
+                </SwipeableItem>
+              </div>
               ))}
             </div>
           </div>
