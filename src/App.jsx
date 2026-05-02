@@ -8,6 +8,7 @@ import LogFeed from './pages/LogFeed';
 import LogNappy from './pages/LogNappy';
 import LogSleep from './pages/LogSleep';
 import LogMedicine from './pages/LogMedicine';
+import LogBath from './pages/LogBath';
 import './App.css';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route path="/log/nappy" element={<LogNappy />} />
         <Route path="/log/sleep" element={<LogSleep />} />
         <Route path="/log/medicine" element={<LogMedicine />} />
+        <Route path="/log/bath" element={<LogBath />} />
       </Routes>
     </BrowserRouter>
   );

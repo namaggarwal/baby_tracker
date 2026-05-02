@@ -23,6 +23,8 @@ export default function QuickAddMenu({ onClose }) {
       navigate('/log/sleep');
     } else if (actionId === 'medicine') {
       navigate('/log/medicine');
+    } else if (actionId === 'bath') {
+      navigate('/log/bath');
     } else {
       await addEvent({ type: actionId });
     }

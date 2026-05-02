@@ -314,6 +314,34 @@
   line-height: 1.6;
 }
 
+.bath-card {
+  background: #8fbcd4;
+  color: white;
+  min-height: auto;
+}
+
+.bath-details-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.bath-pill {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bath-pill.highlight {
+  background: white;
+  color: #8fbcd4;
+}
+
 .icon-secondary { color: var(--color-secondary); }
 .icon-primary { color: white; }
 .icon-white { color: white; font-size: 32px !important; }

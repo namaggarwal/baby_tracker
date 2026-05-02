@@ -43,6 +43,8 @@ export default function Insights() {
       const breastFeeds = feeds.filter(e => e.subtype === 'breast');
       const formulaFeeds = feeds.filter(e => e.subtype === 'formula');
 
+      const dailyBaths = dayEvents.filter(e => e.type === 'bath').length;
+
       dailyStats.push({
         dayName: d.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
         fullDayName: d.toLocaleDateString('en-US', { weekday: 'long' }),
@@ -51,6 +53,7 @@ export default function Insights() {
         feedVolume: feeds.reduce((acc, f) => acc + (parseInt(f.quantity_ml) || 0), 0),
         breastPct: feeds.length ? Math.round((breastFeeds.length / feeds.length) * 100) : 0,
         formulaPct: feeds.length ? Math.round((formulaFeeds.length / feeds.length) * 100) : 0,
+        baths: dailyBaths,
         diapers: {
           wet: dayEvents.filter(e => e.type === 'diaper' && (e.subtype === 'wet' || !e.subtype)).length,
           dirty: dayEvents.filter(e => e.type === 'diaper' && e.subtype === 'dirty').length,
@@ -69,6 +72,9 @@ export default function Insights() {
     const weeklyAvgSleep = (dailyStats.reduce((acc, d) => acc + parseFloat(d.sleepHours), 0) / 7).toFixed(1);
     const weeklyAvgFeed = Math.round(dailyStats.reduce((acc, d) => acc + d.feedVolume, 0) / 7);
     const weeklyAvgDiapers = (dailyStats.reduce((acc, d) => acc + d.diapers.wet + d.diapers.dirty + d.diapers.mixed, 0) / 7).toFixed(1);
+
+    const totalWeeklyBaths = dailyStats.reduce((acc, d) => acc + d.baths, 0);
+    const lastBathEvent = events.filter(e => e.type === 'bath').sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
 
     const allFeeds = events.filter(e => {
       const d = new Date(e.timestamp);
@@ -91,7 +97,9 @@ export default function Insights() {
         feed: weeklyAvgFeed,
         diapers: weeklyAvgDiapers,
         breastPct: weeklyBreastPct,
-        formulaPct: weeklyFormulaPct
+        formulaPct: weeklyFormulaPct,
+        baths: totalWeeklyBaths,
+        lastBath: lastBathEvent?.timestamp || null
       }
     };
   }, [events]);
@@ -249,6 +257,39 @@ export default function Insights() {
           </div>
         </section>
 
+        {/* Bath Card */}
+        <section className="insight-card bath-card full-width">
+          <div className="card-header-horizontal">
+            <div className="icon-title">
+              <span className="material-symbols-outlined icon-white">bathtub</span>
+              <div>
+                <h3>Bath Routine</h3>
+                <p className="card-subtitle">
+                  {stats.averages.lastBath 
+                    ? `Last bath: ${new Date(stats.averages.lastBath).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                    : 'No bath recorded yet'}
+                </p>
+              </div>
+            </div>
+            <div className="stat-summary" style={{ marginLeft: 'auto' }}>
+              <span className="value">{viewMode === 'daily' ? stats.daily.baths : stats.averages.baths}</span>
+              <span className="label">{viewMode === 'weekly' ? 'Total this week' : 'Today'}</span>
+            </div>
+          </div>
+          
+          <div className="bath-details-row">
+            <div className="bath-pill">
+              <span className="material-symbols-outlined">waves</span>
+              <span>Clean & Fresh</span>
+            </div>
+            {stats.daily.baths > 0 && viewMode === 'daily' && (
+              <div className="bath-pill highlight">
+                <span className="material-symbols-outlined">check_circle</span>
+                <span>Done for today</span>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

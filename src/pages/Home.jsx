@@ -169,7 +169,7 @@ export default function Home() {
                      event.type === 'feed' ? `${event.quantity_ml}ml ${event.subtype === 'breast' ? 'Breastmilk' : 'Formula'}` 
                      : event.type === 'diaper' ? (event.size ? `${event.size === 'S' ? 'Small' : event.size === 'M' ? 'Medium' : 'Large'}` : 'Normal')
                      : event.type === 'medicine' ? event.dosage
-                     : 'Normal'
+                     : (event.notes || 'Normal')
                    }`}
                    {event.type === 'sleep' && event.duration && ` • ${event.duration}`}
                  </span>
