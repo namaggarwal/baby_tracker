@@ -7,7 +7,7 @@ export default function Home() {
   const navigate = useNavigate();
   const events = useEvents();
   const { settings } = useSettings();
-  const babyName = settings?.babyName || 'Leo'; // Matching mockup default
+  const babyName = settings?.babyName || 'Tara'; // Matching mockup default
 
   // Simple ring component for daily progress
   const ProgressRing = ({ value, max, label, color }) => {

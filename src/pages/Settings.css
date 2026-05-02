@@ -52,6 +52,75 @@
   border-color: var(--color-primary);
 }
 
+.name-edit-container {
+  margin-top: 4px;
+}
+
+.name-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.name-display:hover .edit-icon {
+  opacity: 1;
+  color: var(--color-primary);
+}
+
+.display-text {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  font-family: var(--font-headline);
+}
+
+.edit-icon {
+  font-size: 20px !important;
+  color: var(--color-on-surface-variant);
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.inline-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inline-edit .settings-input {
+  flex: 1;
+  margin-bottom: 0; /* Override default margin if any */
+}
+
+.icon-btn-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-container);
+  color: var(--color-on-surface);
+  transition: all 0.2s ease;
+}
+
+.icon-btn-small.save {
+  background: var(--color-primary);
+  color: white;
+}
+
+.icon-btn-small.cancel {
+  background: #ecefea;
+  color: #ba1a1a;
+}
+
+.icon-btn-small:active {
+  transform: scale(0.9);
+}
+
 .danger-zone {
   background: rgba(186, 26, 26, 0.05);
   border: 1px solid rgba(186, 26, 26, 0.1);

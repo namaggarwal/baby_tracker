@@ -6,11 +6,18 @@ import './Settings.css';
 export default function Settings() {
   const { settings, updateSetting, resetSettings } = useSettings();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState(settings?.babyName || '');
 
   const handleDeleteAllData = async () => {
     await clearAllEvents();
     await resetSettings();
     window.location.reload();
+  };
+
+  const handleSaveName = async () => {
+    await updateSetting('babyName', tempName);
+    setIsEditingName(false);
   };
 
   return (
@@ -22,15 +29,32 @@ export default function Settings() {
       <section className="settings-section">
         <h3>General</h3>
         <div className="setting-item">
-          <label htmlFor="babyName">Baby's Name</label>
-          <input 
-            type="text" 
-            id="babyName" 
-            value={settings?.babyName || ''} 
-            onChange={(e) => updateSetting('babyName', e.target.value)}
-            placeholder="e.g. Leo"
-            className="settings-input"
-          />
+          <label>Baby's Name</label>
+          <div className="name-edit-container">
+            {isEditingName ? (
+              <div className="inline-edit">
+                <input 
+                  type="text" 
+                  value={tempName} 
+                  onChange={(e) => setTempName(e.target.value)}
+                  placeholder="e.g. Tara"
+                  className="settings-input"
+                  autoFocus
+                />
+                <button className="icon-btn-small save" onClick={handleSaveName}>
+                  <span className="material-symbols-outlined">check</span>
+                </button>
+                <button className="icon-btn-small cancel" onClick={() => setIsEditingName(false)}>
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+            ) : (
+              <div className="name-display" onClick={() => { setTempName(settings?.babyName || 'Tara'); setIsEditingName(true); }}>
+                <span className="display-text">{settings?.babyName || 'Tara'}</span>
+                <span className="material-symbols-outlined edit-icon">edit</span>
+              </div>
+            )}
+          </div>
         </div>
       </section>
       
