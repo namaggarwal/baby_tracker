@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BabyTracker - History</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed-variant": "#484741",
+                      "on-primary-fixed-variant": "#2e4e30",
+                      "on-background": "#191c1a",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed": "#e6e2d9",
+                      "surface-container": "#ecefea",
+                      "primary": "#436444",
+                      "surface-container-low": "#f1f4f0",
+                      "on-surface": "#191c1a",
+                      "on-primary-container": "#f7fff2",
+                      "tertiary-fixed-dim": "#c9c6be",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#012108",
+                      "secondary-fixed": "#e7deff",
+                      "primary-fixed-dim": "#abd0a9",
+                      "inverse-primary": "#abd0a9",
+                      "on-secondary-fixed": "#1d1637",
+                      "surface-bright": "#f7faf5",
+                      "on-secondary": "#ffffff",
+                      "surface-container-highest": "#e0e3df",
+                      "on-tertiary-fixed": "#1c1c17",
+                      "on-surface-variant": "#424841",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary": "#61597e",
+                      "tertiary": "#5d5c55",
+                      "primary-fixed": "#c6edc4",
+                      "tertiary-container": "#76746d",
+                      "on-tertiary-container": "#fffbff",
+                      "on-secondary-container": "#625a7f",
+                      "error-container": "#ffdad6",
+                      "surface-tint": "#456646",
+                      "surface-dim": "#d8dbd6",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#e6e9e4",
+                      "inverse-on-surface": "#eff2ed",
+                      "secondary-container": "#dfd4ff",
+                      "surface-variant": "#e0e3df",
+                      "secondary-fixed-dim": "#cbc1eb",
+                      "on-error": "#ffffff",
+                      "primary-container": "#5b7d5b",
+                      "on-secondary-fixed-variant": "#494265",
+                      "surface": "#f7faf5",
+                      "error": "#ba1a1a",
+                      "outline-variant": "#c2c8be",
+                      "inverse-surface": "#2d312e",
+                      "outline": "#737970",
+                      "background": "#f7faf5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-margin": "24px",
+                      "stack-sm": "8px",
+                      "unit": "8px",
+                      "gutter": "16px",
+                      "stack-lg": "32px",
+                      "touch-target-min": "56px",
+                      "stack-md": "16px"
+              },
+              "fontFamily": {
+                      "label-md": ["Lexend"],
+                      "body-lg": ["Lexend"],
+                      "label-xl": ["Lexend"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "body-md": ["Lexend"],
+                      "headline-lg": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-xl": ["20px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f7faf5;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 40px;
+            bottom: 0;
+            width: 2px;
+            background: #e0e3df;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-md text-on-background">
+<!-- Top App Bar -->
+<header class="bg-stone-50/80 dark:bg-stone-900/80 backdrop-blur-md border-b border-stone-200/50 dark:border-stone-800/50 shadow-sm docked full-width top-0 sticky z-40 flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-primary-fixed border border-outline-variant">
+<img alt="Baby profile photo" class="w-full h-full object-cover" data-alt="A soft and warm close-up portrait of a peaceful newborn baby sleeping under a cream-colored knitted blanket. The lighting is high-key and airy, emphasizing a nurturing and calm atmosphere. The image uses a gentle palette of warm whites and soft sage greens to align with the minimalist digital tracker aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8NsUw83hEMCVQYIGXM0Jyiuy1qED_-NKGfMwnA-x7MV_nG5hB9bchpiYmcHl3B4zcyuxIZoJ011l8g46qaEQyTwErDORw_pqDaAL95_-i96u93CqWFaOwSJkMd4qvzTPOY_KouKeBRdDAOrpGlvUA5AFtB1_C_VOVjTWNzpZXt4Af-uIBku1eV1jGP7rtPrAz2JBW2x0cxBRHKuX4-WBHbwKgIkjpYFfdh-l4_3naDFR7Uza4VRNJ3c58rijfw7heZljoG_bRMY-X"/>
+</div>
+<h1 class="text-lg font-bold text-emerald-900 dark:text-emerald-50 font-['Plus_Jakarta_Sans'] font-semibold tracking-tight">BabyTracker</h1>
+</div>
+<button class="text-emerald-800 dark:text-emerald-200 hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="px-container-margin pt-6 pb-32">
+<!-- Screen Title & Filters -->
+<section class="mb-stack-lg">
+<div class="flex items-center justify-between mb-stack-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Activity History</h2>
+<button class="text-primary font-label-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_today">calendar_today</span>
+<span>Today</span>
+</button>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-stack-sm overflow-x-auto pb-2 -mx-container-margin px-container-margin no-scrollbar">
+<button class="h-touch-target-min px-6 rounded-full bg-primary text-on-primary font-label-md flex items-center justify-center whitespace-nowrap shadow-md active:scale-95 transition-transform">
+                    All
+                </button>
+<button class="h-touch-target-min px-6 rounded-full bg-surface-container border border-outline-variant text-on-surface-variant font-label-md flex items-center gap-2 whitespace-nowrap active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px] text-primary" data-icon="restaurant">restaurant</span>
+                    Feeds
+                </button>
+<button class="h-touch-target-min px-6 rounded-full bg-surface-container border border-outline-variant text-on-surface-variant font-label-md flex items-center gap-2 whitespace-nowrap active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px] text-secondary" data-icon="bedtime">bedtime</span>
+                    Sleep
+                </button>
+<button class="h-touch-target-min px-6 rounded-full bg-surface-container border border-outline-variant text-on-surface-variant font-label-md flex items-center gap-2 whitespace-nowrap active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px] text-tertiary" data-icon="opacity">opacity</span>
+                    Diaper
+                </button>
+</div>
+</section>
+<!-- Timeline -->
+<section class="relative timeline-line space-y-gutter">
+<!-- Feed Card -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-1 w-10 h-10 rounded-full bg-primary-container flex items-center justify-center z-10 shadow-sm border-4 border-background">
+<span class="material-symbols-outlined text-white text-[20px]" data-icon="restaurant" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<div class="bg-surface-container-lowest p-stack-md rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-highest transition-transform active:scale-[0.98]">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-label-xl text-label-xl text-on-surface">Breastfeeding</h3>
+<span class="text-label-md text-outline font-medium">10:30 AM</span>
+</div>
+<p class="text-body-md text-on-surface-variant mb-2">Duration: 15 mins (Left side)</p>
+<div class="flex gap-2">
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-3 py-1 rounded-full text-[12px] font-semibold">Morning Feed</span>
+</div>
+</div>
+</div>
+<!-- Sleep Card -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-1 w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center z-10 shadow-sm border-4 border-background">
+<span class="material-symbols-outlined text-on-secondary-container text-[20px]" data-icon="bedtime" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+</div>
+<div class="bg-surface-container-lowest p-stack-md rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-highest transition-transform active:scale-[0.98]">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-label-xl text-label-xl text-on-surface">Morning Nap</h3>
+<span class="text-label-md text-outline font-medium">08:15 AM</span>
+</div>
+<p class="text-body-md text-on-surface-variant mb-2">Slept for 1h 45m</p>
+<div class="flex gap-2">
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant px-3 py-1 rounded-full text-[12px] font-semibold">Quiet</span>
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant px-3 py-1 rounded-full text-[12px] font-semibold">Crib</span>
+</div>
+</div>
+</div>
+<!-- Diaper Card -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-1 w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center z-10 shadow-sm border-4 border-background">
+<span class="material-symbols-outlined text-white text-[20px]" data-icon="opacity" style="font-variation-settings: 'FILL' 1;">opacity</span>
+</div>
+<div class="bg-surface-container-lowest p-stack-md rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-highest transition-transform active:scale-[0.98]">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-label-xl text-label-xl text-on-surface">Diaper Change</h3>
+<span class="text-label-md text-outline font-medium">07:50 AM</span>
+</div>
+<p class="text-body-md text-on-surface-variant mb-2">Wet and Dirty</p>
+<div class="flex gap-2">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full text-[12px] font-semibold">Rash Cream</span>
+</div>
+</div>
+</div>
+<!-- Yesterday Divider -->
+<div class="relative py-stack-md">
+<div aria-hidden="true" class="absolute inset-0 flex items-center px-4">
+<div class="w-full border-t border-surface-container-highest"></div>
+</div>
+<div class="relative flex justify-center">
+<span class="bg-background px-4 text-label-md text-outline font-semibold uppercase tracking-wider">Yesterday</span>
+</div>
+</div>
+<!-- Another Feed Card -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-1 w-10 h-10 rounded-full bg-primary-container flex items-center justify-center z-10 shadow-sm border-4 border-background">
+<span class="material-symbols-outlined text-white text-[20px]" data-icon="restaurant" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<div class="bg-surface-container-lowest p-stack-md rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.04)] border border-surface-container-highest transition-transform active:scale-[0.98]">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-label-xl text-label-xl text-on-surface">Bottle Feed</h3>
+<span class="text-label-md text-outline font-medium">11:45 PM</span>
+</div>
+<p class="text-body-md text-on-surface-variant mb-2">120ml Breast Milk</p>
+<div class="flex gap-2">
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-3 py-1 rounded-full text-[12px] font-semibold">Dream Feed</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB for Quick Actions -->
+<!-- Bottom Navigation Bar -->
+<nav class="bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.08)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 rounded-t-[32px] border-t border-stone-200/30">
+<a class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-3 py-1 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 rounded-2xl active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl px-3 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="history" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium mt-1">History</span>
+</a>
+<div class="relative flex items-center justify-center -top-6">
+<button class="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg active:scale-95 transition-transform duration-200" style="background-color: #6B8E6B; margin-bottom: -16px;">
+<span class="material-symbols-outlined text-[32px] font-bold" data-icon="add">add</span>
+</button>
+</div> <!-- Spacer for center alignment logic -->
+<a class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-3 py-1 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 rounded-2xl active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium mt-1">Insights</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-3 py-1 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 rounded-2xl active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium mt-1">Settings</span>
+</a>
+</nav>
+<!-- Hidden FAB Icon logic to match JSON structure -->
+<div class="hidden">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</div>
+</body></html>

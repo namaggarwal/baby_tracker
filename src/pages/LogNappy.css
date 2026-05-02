@@ -1,0 +1,37 @@
+@import './LogFeed.css';
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.type-card {
+  background: #f4f7f4;
+  border-radius: 24px;
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: none;
+  color: #191c1a;
+  transition: all 0.2s;
+  gap: 12px;
+}
+
+.type-card.active {
+  background: #436444; /* Dark green */
+  color: #ffffff;
+}
+
+.type-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+}
+
+.type-label {
+  font-size: 16px;
+  font-weight: 600;
+}

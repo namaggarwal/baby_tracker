@@ -1,0 +1,72 @@
+.modal-overlay {
+  justify-content: flex-end;
+}
+
+.quick-add-sheet {
+  background: #ffffff;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  padding: 32px 24px;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom)); /* Leave space for FAB */
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.05);
+  margin: 0 16px;
+  margin-bottom: -40px; /* pull down behind the nav area */
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.sheet-header h3 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+  color: #191c1a;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 32px;
+  column-gap: 16px;
+}
+
+.action-card {
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  box-shadow: none;
+}
+
+.icon-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #424841;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

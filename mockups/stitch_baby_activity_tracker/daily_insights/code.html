@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BabyTracker Insights</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Lexend:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#484741",
+                        "on-primary-fixed-variant": "#2e4e30",
+                        "on-background": "#191c1a",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#e6e2d9",
+                        "surface-container": "#ecefea",
+                        "primary": "#436444",
+                        "surface-container-low": "#f1f4f0",
+                        "on-surface": "#191c1a",
+                        "on-primary-container": "#f7fff2",
+                        "tertiary-fixed-dim": "#c9c6be",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#012108",
+                        "secondary-fixed": "#e7deff",
+                        "primary-fixed-dim": "#abd0a9",
+                        "inverse-primary": "#abd0a9",
+                        "on-secondary-fixed": "#1d1637",
+                        "surface-bright": "#f7faf5",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#e0e3df",
+                        "on-tertiary-fixed": "#1c1c17",
+                        "on-surface-variant": "#424841",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#61597e",
+                        "tertiary": "#5d5c55",
+                        "primary-fixed": "#c6edc4",
+                        "tertiary-container": "#76746d",
+                        "on-tertiary-container": "#fffbff",
+                        "on-secondary-container": "#625a7f",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#456646",
+                        "surface-dim": "#d8dbd6",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e6e9e4",
+                        "inverse-on-surface": "#eff2ed",
+                        "secondary-container": "#dfd4ff",
+                        "surface-variant": "#e0e3df",
+                        "secondary-fixed-dim": "#cbc1eb",
+                        "on-error": "#ffffff",
+                        "primary-container": "#5b7d5b",
+                        "on-secondary-fixed-variant": "#494265",
+                        "surface": "#f7faf5",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c2c8be",
+                        "inverse-surface": "#2d312e",
+                        "outline": "#737970",
+                        "background": "#f7faf5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-margin": "24px",
+                        "stack-sm": "8px",
+                        "unit": "8px",
+                        "gutter": "16px",
+                        "stack-lg": "32px",
+                        "touch-target-min": "56px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Lexend"],
+                        "body-lg": ["Lexend"],
+                        "label-xl": ["Lexend"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Lexend"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-xl": ["20px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chart-bar {
+            transition: height 0.3s ease;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-stone-50/80 dark:bg-stone-900/80 backdrop-blur-md border-b border-stone-200/50 dark:border-stone-800/50 shadow-sm docked full-width top-0 sticky z-40 flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img alt="Baby profile photo" class="w-full h-full object-cover" data-alt="A close-up, high-key portrait of a smiling infant with soft morning light filtering through a nursery window. The aesthetic is clean and minimalist with warm cream tones and gentle sage green accents in the background fabrics. The mood is peaceful, nurturing, and professional, reflecting a high-quality parenting application interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBU0bmaUluf5jXtqIADuceOgrXeGXahe41PetHX_DlETwIv5lmY9ffsinbIpzbYQjm0m19KFlYiwqHmwMh1QV7ZzeY7zYEb3o6bKNME27QA6UfFPVFcXWlYtMRHJygz0EZDmMz3Zztny80QIYppTpMkdqjYjxTkSYNteo0ZkRH_Lz1JfLSfrPqZzDj4NcoGrS7DSXO1EEj0_WRMmh49Ayila4HHoBspa6bTDXKiC9CEAlr8psox9gakt5bazPDRt9HmX7IX99HT1Dgz"/>
+</div>
+<h1 class="text-lg font-bold text-emerald-900 dark:text-emerald-50 font-['Plus_Jakarta_Sans'] font-semibold tracking-tight">BabyTracker</h1>
+</div>
+<button class="text-stone-500 dark:text-stone-400 hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="px-container-margin pt-stack-lg space-y-stack-lg">
+<!-- Hero Header -->
+<section class="space-y-stack-sm">
+<h2 class="font-headline-lg text-headline-lg text-primary">Weekly Insights</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Oct 12 — Oct 18 • Week 12</p>
+</section>
+<!-- Main Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Sleep Duration Bar Chart -->
+<div class="bg-secondary-container rounded-lg p-stack-md shadow-[0_16px_24px_rgba(97,89,126,0.08)] flex flex-col justify-between min-h-[280px]">
+<div>
+<div class="flex justify-between items-start mb-stack-md">
+<div>
+<span class="material-symbols-outlined text-secondary" data-icon="bedtime">bedtime</span>
+<h3 class="font-headline-md text-headline-md text-on-secondary-container mt-unit">Sleep</h3>
+</div>
+<div class="text-right">
+<p class="font-label-xl text-label-xl text-secondary">14.2h</p>
+<p class="font-label-md text-label-md text-on-secondary-container opacity-70">Daily Avg</p>
+</div>
+</div>
+<!-- Simple Bar Chart -->
+<div class="flex items-end justify-between h-32 gap-2 mt-stack-md">
+<div class="flex flex-col items-center flex-1 gap-2">
+<div class="w-full bg-secondary rounded-full chart-bar" style="height: 70%;"></div>
+<span class="text-[10px] font-medium text-secondary opacity-60">M</span>
+</div>
+<div class="flex flex-col items-center flex-1 gap-2">
+<div class="w-full bg-secondary rounded-full chart-bar" style="height: 85%;"></div>
+<span class="text-[10px] font-medium text-secondary opacity-60">T</span>
+</div>
+<div class="flex flex-col items-center flex-1 gap-2">
+<div class="w-full bg-secondary rounded-full chart-bar" style="height: 60%;"></div>
+<span class="text-[10px] font-medium text-secondary opacity-60">W</span>
+</div>
+<div class="flex flex-col items-center flex-1 gap-2">
+<div class="w-full bg-secondary rounded-full chart-bar" style="height: 95%;"></div>
+<span class="text-[10px] font-medium text-secondary opacity-60">T</span>
+</div>
+<div class="flex flex-col items-center flex-1 gap-2">
+<div class="w-full bg-secondary rounded-full chart-bar" style="height: 75%;"></div>
+<span class="text-[10px] font-medium text-secondary opacity-60">F</span>
+</div>
+<div class="flex flex-col items-center flex-1 gap-2">
+<div class="w-full bg-secondary rounded-full chart-bar" style="height: 40%;"></div>
+<span class="text-[10px] font-medium text-secondary opacity-60">S</span>
+</div>
+<div class="flex flex-col items-center flex-1 gap-2">
+<div class="w-full bg-secondary rounded-full chart-bar" style="height: 80%;"></div>
+<span class="text-[10px] font-medium text-secondary opacity-60">S</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Feed Frequency & Volume -->
+<div class="bg-primary-container rounded-lg p-stack-md shadow-[0_16px_24px_rgba(67,100,68,0.08)] flex flex-col justify-between min-h-[280px]">
+<div>
+<div class="flex justify-between items-start mb-stack-md">
+<div>
+<span class="material-symbols-outlined text-on-primary-container" data-icon="nutrition">nutrition</span>
+<h3 class="font-headline-md text-headline-md text-on-primary-container mt-unit">Feeding</h3>
+</div>
+<div class="text-right">
+<p class="font-label-xl text-label-xl text-on-primary-container">820ml</p>
+<p class="font-label-md text-label-md text-on-primary-container opacity-70">Daily Avg</p>
+</div>
+</div>
+<!-- Progress Rings for Stats -->
+<div class="grid grid-cols-2 gap-gutter mt-stack-md">
+<div class="bg-white/20 rounded-lg p-4 flex flex-col items-center text-center">
+<div class="relative w-16 h-16 flex items-center justify-center mb-2">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-white/20" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="6"></circle>
+<circle class="text-white" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="176" stroke-dashoffset="44" stroke-width="6"></circle>
+</svg>
+<span class="absolute text-label-md font-bold text-white">75%</span>
+</div>
+<p class="text-white text-[11px] font-medium uppercase tracking-wider">Breast</p>
+</div>
+<div class="bg-white/20 rounded-lg p-4 flex flex-col items-center text-center">
+<div class="relative w-16 h-16 flex items-center justify-center mb-2">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-white/20" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-width="6"></circle>
+<circle class="text-white" cx="32" cy="32" fill="transparent" r="28" stroke="currentColor" stroke-dasharray="176" stroke-dashoffset="132" stroke-width="6"></circle>
+</svg>
+<span class="absolute text-label-md font-bold text-white">25%</span>
+</div>
+<p class="text-white text-[11px] font-medium uppercase tracking-wider">Bottle</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Diaper Counts Section -->
+<div class="bg-tertiary-container rounded-lg p-stack-md shadow-[0_16px_24px_rgba(93,92,85,0.08)] col-span-1 md:col-span-2">
+<div class="flex items-center gap-4 mb-stack-md">
+<span class="material-symbols-outlined text-white text-3xl" data-icon="opacity">opacity</span>
+<div>
+<h3 class="font-headline-md text-headline-md text-white">Diaper Changes</h3>
+<p class="font-body-md text-body-md text-white/80">6.4 changes per day average</p>
+</div>
+</div>
+<div class="flex flex-wrap gap-stack-sm">
+<!-- Nappy Count Visualizer -->
+<div class="flex-1 min-w-[140px] bg-white/10 rounded-lg p-4 flex justify-between items-center">
+<span class="text-white/60 font-medium">Wet</span>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold text-white">32</span>
+<span class="material-symbols-outlined text-white/40" data-icon="water_drop">water_drop</span>
+</div>
+</div>
+<div class="flex-1 min-w-[140px] bg-white/10 rounded-lg p-4 flex justify-between items-center">
+<span class="text-white/60 font-medium">Dirty</span>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold text-white">14</span>
+<span class="material-symbols-outlined text-white/40" data-icon="eco">eco</span>
+</div>
+</div>
+<div class="flex-1 min-w-[140px] bg-white/10 rounded-lg p-4 flex justify-between items-center border border-white/20">
+<span class="text-white/60 font-medium">Mixed</span>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold text-white">6</span>
+<span class="material-symbols-outlined text-white/40" data-icon="layers">layers</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Trend Card -->
+<section class="bg-surface-container-low rounded-lg p-stack-md border border-outline-variant">
+<h4 class="font-label-xl text-label-xl text-primary mb-unit">Developmental Note</h4>
+<div class="flex gap-stack-md items-start">
+<div class="p-3 bg-primary/10 rounded-full text-primary">
+<span class="material-symbols-outlined" data-icon="lightbulb">lightbulb</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Leo is sleeping 45 minutes longer on average this week compared to last. This often happens during growth spurts. Keep maintaining the calm evening routine!
+                </p>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-xl fixed bottom-0 w-full rounded-t-[32px] border-t border-stone-200/30 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] z-50 flex justify-around items-center px-4 pb-6 pt-3">
+<a class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-3 py-1 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 rounded-2xl active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-3 py-1 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 rounded-2xl active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium">History</span>
+</a>
+<div class="relative -top-8">
+<button class="bg-emerald-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center justify-center text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl px-3 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="insights" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium">Insights</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-3 py-1 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 rounded-2xl active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium">Settings</span>
+</a>
+</nav>
+</body></html>

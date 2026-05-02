@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Lexend:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "tertiary-fixed-dim": "#c9c6be",
+                    "outline": "#737970",
+                    "tertiary": "#5d5c55",
+                    "surface-container-low": "#f1f4f0",
+                    "inverse-primary": "#abd0a9",
+                    "surface-tint": "#456646",
+                    "primary": "#436444",
+                    "on-secondary-fixed-variant": "#494265",
+                    "on-tertiary-fixed": "#1c1c17",
+                    "surface-container-high": "#e6e9e4",
+                    "on-tertiary-container": "#fffbff",
+                    "on-secondary-fixed": "#1d1637",
+                    "tertiary-container": "#76746d",
+                    "surface": "#f7faf5",
+                    "secondary": "#61597e",
+                    "on-secondary-container": "#625a7f",
+                    "on-primary-fixed": "#012108",
+                    "on-surface": "#191c1a",
+                    "primary-fixed-dim": "#abd0a9",
+                    "on-primary": "#ffffff",
+                    "background": "#f7faf5",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-highest": "#e0e3df",
+                    "secondary-fixed": "#e7deff",
+                    "on-background": "#191c1a",
+                    "on-tertiary-fixed-variant": "#484741",
+                    "inverse-on-surface": "#eff2ed",
+                    "primary-fixed": "#c6edc4",
+                    "surface-variant": "#e0e3df",
+                    "on-primary-container": "#f7fff2",
+                    "surface-container": "#ecefea",
+                    "surface-bright": "#f7faf5",
+                    "primary-container": "#5b7d5b",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c2c8be",
+                    "error-container": "#ffdad6",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#dfd4ff",
+                    "secondary-fixed-dim": "#cbc1eb",
+                    "on-surface-variant": "#424841",
+                    "inverse-surface": "#2d312e",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed-variant": "#2e4e30",
+                    "tertiary-fixed": "#e6e2d9",
+                    "surface-dim": "#d8dbd6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "8px",
+                    "container-margin": "24px",
+                    "gutter": "16px",
+                    "stack-sm": "8px",
+                    "stack-lg": "32px",
+                    "touch-target-min": "56px",
+                    "stack-md": "16px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-md": ["Lexend"],
+                    "label-xl": ["Lexend"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Lexend"],
+                    "body-lg": ["Lexend"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "label-xl": ["20px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f7faf5;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #436444;
+            box-shadow: 0 0 0 4px rgba(67, 100, 68, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-md text-on-surface antialiased pb-32">
+<!-- TopAppBar -->
+<header class="bg-[#FFFDF5] dark:bg-stone-900 shadow-sm dark:shadow-none font-['Plus_Jakarta_Sans'] font-bold text-lg docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img alt="Baby profile picture" class="w-full h-full object-cover" data-alt="A close-up, high-key portrait of a smiling baby with soft, natural lighting in a minimalist nursery setting. The background features warm cream and sage green tones, creating a nurturing and calm atmosphere. The image is clean and bright, matching a soft-UI parent-focused application aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsODVACH_3vuO-0sd2TodoWjSBxrldTHC11GWXzikB-xQq3rs74iqu7VLDyIXJkkdR1-r50yYGqS9JZ3GOwXLQE5N__OUe0ibvyM3Rp-QJ91kjcjnLT1qBnSitLd54hWwCGJ0nqG27L9eEztEgkNr7DzAUsXdfSCdoWhoEMuMc3Y0FSNyJ-X9fc9rOpLHh9awn-rHnrZBeVf86m67Ob9QJELqcmRiE8ctWtjSjLkrnVqpnxt3Yi9JMLMlQviJH64lPedmrpXK6Ih82"/>
+</div>
+<span class="text-[#6B8E6B] font-extrabold text-xl">Settings</span>
+</div>
+<button class="text-[#6B8E6B] dark:text-[#8BAB8B] p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-all duration-300 ease-in-out">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="max-w-xl mx-auto px-container-margin mt-stack-lg space-y-gutter">
+<!-- Profile Section -->
+<section class="space-y-stack-md">
+<h2 class="font-headline-md text-headline-md text-primary px-2">Baby Profile</h2>
+<div class="glass-card p-6 rounded-lg shadow-sm space-y-stack-md">
+<div class="space-y-unit">
+<label class="font-label-md text-label-md text-outline px-1">Baby's Name</label>
+<input class="w-full bg-surface-container-lowest border-outline-variant rounded-DEFAULT h-touch-target-min px-4 font-body-lg text-on-surface" placeholder="Enter baby's name" type="text" value="Leo"/>
+</div>
+</div>
+</section>
+<!-- Feeding Preferences -->
+<section class="space-y-stack-md">
+<h2 class="font-headline-md text-headline-md text-primary px-2">Tracking Defaults</h2>
+<div class="glass-card p-6 rounded-lg shadow-sm space-y-6">
+<div class="space-y-unit">
+<label class="font-label-md text-label-md text-outline px-1">Default Feed Size</label>
+<div class="grid grid-cols-4 gap-2">
+<button class="h-12 rounded-DEFAULT border-2 border-primary bg-primary text-on-primary font-label-md">S</button>
+<button class="h-12 rounded-DEFAULT border-2 border-outline-variant text-outline hover:border-primary transition-colors font-label-md">M</button>
+<button class="h-12 rounded-DEFAULT border-2 border-outline-variant text-outline hover:border-primary transition-colors font-label-md">L</button>
+<button class="h-12 rounded-DEFAULT border-2 border-outline-variant text-outline hover:border-primary transition-colors font-label-md">XL</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-DEFAULT">
+<div class="flex flex-col">
+<span class="font-label-xl text-on-surface">Preferred Units</span>
+<span class="text-label-md text-outline">Measurement scale</span>
+</div>
+<div class="flex bg-surface-variant p-1 rounded-full">
+<button class="px-6 py-2 rounded-full bg-white shadow-sm font-label-md text-primary">ml</button>
+<button class="px-6 py-2 rounded-full font-label-md text-outline">oz</button>
+</div>
+</div>
+</div>
+</section><section class="space-y-stack-md">
+<h2 class="font-headline-md text-headline-md text-primary px-2">Daily Goals</h2>
+<div class="glass-card p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<div class="space-y-unit">
+<label class="font-label-md text-label-md text-outline px-1">Daily Nap Goal (hours)</label>
+<input class="w-full bg-surface-container-lowest border-outline-variant rounded-DEFAULT h-touch-target-min px-4 font-body-lg text-on-surface" placeholder="e.g. 3" type="number"/>
+</div>
+<div class="space-y-unit">
+<label class="font-label-md text-label-md text-outline px-1">Target Feeds per Day</label>
+<input class="w-full bg-surface-container-lowest border-outline-variant rounded-DEFAULT h-touch-target-min px-4 font-body-lg text-on-surface" placeholder="e.g. 8" type="number"/>
+</div>
+<div class="space-y-unit">
+<label class="font-label-md text-label-md text-outline px-1">Target Nappies per Day</label>
+<input class="w-full bg-surface-container-lowest border-outline-variant rounded-DEFAULT h-touch-target-min px-4 font-body-lg text-on-surface" placeholder="e.g. 6" type="number"/>
+</div>
+<div class="space-y-unit">
+<label class="font-label-md text-label-md text-outline px-1">Tummy Time Goal (minutes)</label>
+<input class="w-full bg-surface-container-lowest border-outline-variant rounded-DEFAULT h-touch-target-min px-4 font-body-lg text-on-surface" placeholder="e.g. 20" type="number"/>
+</div>
+</div>
+</section>
+<!-- Sync Section -->
+<section class="space-y-stack-md">
+<h2 class="font-headline-md text-headline-md text-primary px-2">Data &amp; Backup</h2>
+<div class="glass-card p-6 rounded-lg shadow-sm space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#E8F0FE] flex items-center justify-center text-[#4285F4]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">cloud_sync</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-xl text-on-surface">Google Sheets Sync</span>
+<span class="text-label-md text-outline">Auto-backup every 6 hours</span>
+</div>
+</div>
+<div class="relative inline-flex h-8 w-14 items-center rounded-full bg-primary-container">
+<span class="ml-1 h-6 w-6 rounded-full bg-white shadow-sm translate-x-6 transition-transform"></span>
+</div>
+</div>
+<button class="w-full h-touch-target-min bg-primary text-on-primary rounded-full font-headline-md flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">sync</span>
+                    Manual Sync
+                </button>
+</div>
+</section>
+<!-- App Info -->
+<section class="pt-stack-lg pb-stack-lg space-y-6 text-center">
+<div class="flex flex-col items-center gap-2">
+<div class="w-16 h-16 rounded-2xl bg-primary-container flex items-center justify-center text-on-primary-container mb-2">
+<span class="material-symbols-outlined text-4xl">child_care</span>
+</div>
+<p class="font-headline-md text-primary">Little One</p>
+<p class="text-label-md text-outline">Version 2.4.1 (Build 882)</p>
+</div>
+<p class="text-[12px] text-outline px-container-margin pt-4">
+                Designed for parents, by parents. © 2024 Little One BabyTrack.
+            </p>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-stone-50/90 dark:bg-stone-900/90 backdrop-blur-xl rounded-t-[32px] border-t border-stone-200/30 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
+<!-- Home -->
+<button class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-3 py-1 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 rounded-2xl active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium">Home</span>
+</button>
+<!-- History -->
+<button class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-3 py-1 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 rounded-2xl active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium">History</span>
+</button>
+<!-- Add Button -->
+<button class="flex items-center justify-center bg-emerald-700 dark:bg-emerald-300 text-white dark:text-emerald-950 w-12 h-12 rounded-full shadow-lg active:scale-90 transition-transform duration-150 -mt-8 border-4 border-stone-50 dark:border-stone-900">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+<!-- Insights -->
+<button class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-3 py-1 hover:bg-stone-100/50 dark:hover:bg-stone-800/50 rounded-2xl active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium">Insights</span>
+</button>
+<!-- Settings (Active) -->
+<button class="flex flex-col items-center justify-center text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl px-3 py-1 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[11px] font-medium">Settings</span>
+</button>
+</nav>
+</body></html>

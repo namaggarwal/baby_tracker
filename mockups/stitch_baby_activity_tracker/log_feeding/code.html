@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Lexend:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#f7fff2",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#cbc1eb",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2d312e",
+                        "on-secondary-container": "#625a7f",
+                        "tertiary-container": "#76746d",
+                        "on-primary-fixed": "#012108",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#456646",
+                        "on-tertiary-fixed-variant": "#484741",
+                        "primary-container": "#5b7d5b",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#c6edc4",
+                        "on-tertiary-container": "#fffbff",
+                        "surface-bright": "#f7faf5",
+                        "surface-container-high": "#e6e9e4",
+                        "secondary-container": "#dfd4ff",
+                        "secondary-fixed": "#e7deff",
+                        "inverse-primary": "#abd0a9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#1d1637",
+                        "on-secondary-fixed-variant": "#494265",
+                        "on-background": "#191c1a",
+                        "surface-container-low": "#f1f4f0",
+                        "primary-fixed-dim": "#abd0a9",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d8dbd6",
+                        "outline-variant": "#c2c8be",
+                        "secondary": "#61597e",
+                        "on-tertiary-fixed": "#1c1c17",
+                        "on-primary-fixed-variant": "#2e4e30",
+                        "background": "#f7faf5",
+                        "surface": "#f7faf5",
+                        "on-surface-variant": "#424841",
+                        "tertiary-fixed": "#e6e2d9",
+                        "on-surface": "#191c1a",
+                        "surface-variant": "#e0e3df",
+                        "primary": "#436444",
+                        "outline": "#737970",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#5d5c55",
+                        "tertiary-fixed-dim": "#c9c6be",
+                        "surface-container": "#ecefea",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#e0e3df",
+                        "inverse-on-surface": "#eff2ed"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "touch-target-min": "56px",
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "gutter": "16px",
+                        "container-margin": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-xl": ["Lexend"],
+                        "body-md": ["Lexend"],
+                        "body-lg": ["Lexend"],
+                        "label-md": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "label-xl": ["20px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tap-highlight-transparent {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<header class="bg-[#FFFDF5] dark:bg-stone-900 shadow-sm sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-4">
+<button aria-label="Go back" class="w-touch-target-min h-touch-target-min flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary">Log Feeding</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container">
+<img alt="Baby Profile" class="w-full h-full object-cover" data-alt="A close-up, high-key portrait of a peaceful newborn baby sleeping on a soft, cream-colored knitted blanket. The lighting is diffused and natural, emphasizing a nurturing and calm atmosphere consistent with a modern parenting app. The color palette features warm creams and soft sage greens, creating a gentle and reliable aesthetic for a high-end UI design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpXjlCKjX0dvTGcW6K7rBo_nvxeOGpoctTsngee5t5x7N9CDuhNB4Q7Xj-j4EG0djmtfAKyPK4C7aSuZauo7wPX43FwZlYSeY9CwWDSvqj_t0DxWC-o6eKCxgmcoeAZI1a0wGov--huZrsmucTPv-Z3wE84j5Ep6W1Wn91V7WgF0PNizzZMwXNPQgEZV2CYv4fjnrLwJ9_mEiyn5sS4L9I2VICt3vLZfME5sviap2bp3Dix1jUEl2zS8mebwO6UZcJDrLyfSoIjOKk"/>
+</div>
+</header>
+<main class="max-w-md mx-auto px-container-margin py-stack-lg pb-40">
+<!-- Toggle Switch -->
+<section class="mb-stack-lg">
+<div class="bg-surface-container p-1 rounded-lg flex items-center shadow-inner">
+<button class="flex-1 py-3 px-4 rounded-md font-label-xl text-label-xl bg-white text-primary shadow-sm transition-all duration-300">
+                    Breast
+                </button>
+<button class="flex-1 py-3 px-4 rounded-md font-label-xl text-label-xl text-outline hover:text-primary transition-all duration-300">
+                    Formula
+                </button>
+</div>
+</section>
+<!-- Bento Layout for Quick Selection (Breast Selected) -->
+<section class="space-y-stack-md">
+<div class="flex items-center justify-between px-1">
+<h2 class="font-headline-md text-headline-md text-on-surface">Select Size</h2>
+<span class="font-label-md text-label-md text-primary bg-primary-fixed px-3 py-1 rounded-full">Last: 120ml</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Size S -->
+<button class="group flex flex-col items-center justify-center bg-white border-2 border-transparent hover:border-primary p-6 rounded-lg shadow-sm transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined text-primary mb-2 text-4xl" data-icon="child_care">child_care</span>
+<span class="font-label-xl text-label-xl text-on-surface">S</span>
+<span class="font-label-md text-label-md text-outline">60ml</span>
+</button>
+<!-- Size M -->
+<button class="group flex flex-col items-center justify-center bg-primary border-2 border-primary p-6 rounded-lg shadow-md transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined text-on-primary mb-2 text-4xl" data-icon="child_care">child_care</span>
+<span class="font-label-xl text-label-xl text-on-primary">M</span>
+<span class="font-label-md text-label-md text-primary-fixed">120ml</span>
+</button>
+<!-- Size L -->
+<button class="group flex flex-col items-center justify-center bg-white border-2 border-transparent hover:border-primary p-6 rounded-lg shadow-sm transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined text-primary mb-2 text-4xl" data-icon="child_care">child_care</span>
+<span class="font-label-xl text-label-xl text-on-surface">L</span>
+<span class="font-label-md text-label-md text-outline">180ml</span>
+</button>
+<!-- Size XL -->
+<button class="group flex flex-col items-center justify-center bg-white border-2 border-transparent hover:border-primary p-6 rounded-lg shadow-sm transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined text-primary mb-2 text-4xl" data-icon="child_care">child_care</span>
+<span class="font-label-xl text-label-xl text-on-surface">XL</span>
+<span class="font-label-md text-label-md text-outline">240ml</span>
+</button>
+</div>
+</section>
+<!-- Details Section -->
+<section class="mt-stack-lg space-y-stack-md">
+<h2 class="font-headline-md text-headline-md text-on-surface px-1">Details</h2>
+<!-- Side Selection (Specific for Breast) -->
+<div class="flex gap-3">
+<button class="flex-1 h-touch-target-min rounded-full border-2 border-primary bg-primary-fixed text-primary font-label-md flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    Left Side
+                </button>
+<button class="flex-1 h-touch-target-min rounded-full border-2 border-outline-variant text-outline font-label-md flex items-center justify-center">
+                    Right Side
+                </button>
+</div>
+<!-- Time Input -->
+<div class="bg-white p-6 rounded-lg shadow-sm border border-surface-container-high">
+<label class="block font-label-md text-label-md text-outline mb-2">Time of feeding</label>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md text-on-surface">10:45 AM</span>
+<button class="text-primary font-label-md flex items-center gap-1">
+<span class="material-symbols-outlined" data-icon="edit_calendar">edit_calendar</span>
+                        Change
+                    </button>
+</div>
+</div>
+<!-- Notes -->
+<div class="bg-white p-6 rounded-lg shadow-sm border border-surface-container-high">
+<label class="block font-label-md text-label-md text-outline mb-2">Notes (Optional)</label>
+<textarea class="w-full border-none focus:ring-0 p-0 text-body-lg font-body-lg placeholder:text-surface-dim resize-none" placeholder="How was the feeding today?" rows="2"></textarea>
+</div>
+</section>
+</main>
+<!-- Bottom Action Bar -->
+<footer class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md px-container-margin pt-4 pb-10 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 rounded-t-xl">
+<button class="w-full h-touch-target-min bg-primary text-on-primary rounded-lg font-label-xl text-label-xl shadow-lg hover:brightness-105 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3">
+<span class="material-symbols-outlined" data-icon="save" style="font-variation-settings: 'FILL' 1;">save</span>
+            Log Entry
+        </button>
+</footer>
+<!-- Bottom Navigation Bar (Hidden for Task/Form Focus but present in DOM) -->
+<nav class="hidden md:flex fixed bottom-0 left-0 w-full bg-white/80 dark:bg-stone-900/80 backdrop-blur-md shadow-[0_-4px_20px_rgba(107,142,107,0.08)] rounded-t-[32px] border-t border-stone-100 dark:border-stone-800 justify-around items-center px-4 pt-3 pb-8 z-[60]">
+<div class="flex flex-col items-center justify-center text-stone-400 dark:text-stone-500 hover:text-[#6B8E6B] transition-colors">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[12px] font-semibold">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-400 dark:text-stone-500 hover:text-[#6B8E6B] transition-colors">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[12px] font-semibold">Timeline</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-400 dark:text-stone-500 hover:text-[#6B8E6B] transition-colors">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[12px] font-semibold">Summary</span>
+</div>
+<div class="flex flex-col items-center justify-center text-stone-400 dark:text-stone-500 hover:text-[#6B8E6B] transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[12px] font-semibold">Settings</span>
+</div>
+</nav>
+</body></html>
