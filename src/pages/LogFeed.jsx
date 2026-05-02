@@ -1,12 +1,16 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addEvent } from '../hooks/useEvents';
+import { addEvent, useEvents } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
+import { formatTime } from '../utils/timeFormat';
 import './LogFeed.css';
 
 export default function LogFeed() {
   const navigate = useNavigate();
+  const events = useEvents();
   const { settings } = useSettings();
+  const lastFeed = events?.find(e => e.type === 'feed');
+  const lastQuantity = lastFeed?.quantity_ml ? `${lastFeed.quantity_ml}ml` : '--ml';
   const timeInputRef = useRef(null);
   const [type, setType] = useState('breast'); // 'breast' | 'formula'
   const [size, setSize] = useState('M'); // S, M, L, XL
@@ -18,13 +22,13 @@ export default function LogFeed() {
     return now.toTimeString().slice(0, 5); // HH:MM
   });
 
-  const displayTime = new Date(`2000-01-01T${time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const displayTime = formatTime(new Date(`2000-01-01T${time}`), settings?.timeFormat);
 
   const sizes = [
-    { id: 'S', ml: 60 },
-    { id: 'M', ml: 120 },
-    { id: 'L', ml: 180 },
-    { id: 'XL', ml: 240 },
+    { id: 'S', ml: 30 },
+    { id: 'M', ml: 60 },
+    { id: 'L', ml: 90 },
+    { id: 'XL', ml: 120 },
   ];
 
   const quantities = [60, 120, 180, 240];
@@ -80,7 +84,7 @@ export default function LogFeed() {
           <>
             <div className="section-header-row">
               <h3>Select Size</h3>
-              <span className="last-log-tag">Last: 120ml</span>
+              <span className="last-log-tag">Last: {lastQuantity}</span>
             </div>
             
             <div className="grid-2x2">
