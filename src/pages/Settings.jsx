@@ -26,8 +26,40 @@ export default function Settings() {
         <h2>Settings</h2>
       </header>
       
-      <section className="settings-section">
-        <h3>General</h3>
+      <section className="settings-section profile-section">
+        <div className="profile-upload-container">
+          <div className="profile-image-wrapper" onClick={() => document.getElementById('profile-upload').click()}>
+            <img 
+              src={settings?.profileImage || 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=120&q=80'} 
+              alt="Baby Profile" 
+              className="settings-avatar" 
+              onError={(e) => { e.target.onerror = null; e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="60" fill="%23e6e9e4"/><path d="M60 30c-9.9 0-18 8.1-18 18s8.1 18 18 18 18-8.1 18-18-8.1-18-18-18zm0 40c-15.5 0-45 7.8-45 23.3V100h90v-6.7c0-15.5-29.5-23.3-45-23.3z" fill="%23a8ae9e"/></svg>'; }}
+            />
+            <div className="upload-overlay">
+              <span className="material-symbols-outlined">photo_camera</span>
+            </div>
+            <input 
+              type="file" 
+              id="profile-upload" 
+              accept="image/*" 
+              onChange={async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onloadend = async () => {
+                    await updateSetting('profileImage', reader.result);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }} 
+              hidden 
+            />
+          </div>
+          <div className="profile-info">
+            <label>Baby's Profile Photo</label>
+            <p className="setting-description">Tap the photo to upload a new one</p>
+          </div>
+        </div>
         <div className="setting-item">
           <label>Baby's Name</label>
           <div className="name-edit-container">

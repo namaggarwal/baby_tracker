@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addEvent } from '../hooks/useEvents';
+import { useSettings } from '../hooks/useSettings';
 import './LogFeed.css'; // Reusing some shared layout styles
 import './LogMedicine.css';
 
 export default function LogMedicine() {
   const navigate = useNavigate();
+  const { settings } = useSettings();
   const timeInputRef = useRef(null);
   const [medicineName, setMedicineName] = useState('Vitamin D');
   const [dosage, setDosage] = useState('1');
@@ -45,7 +47,7 @@ export default function LogMedicine() {
         </button>
         <h2>Log Medicine</h2>
         <div className="avatar-placeholder-small">
-          <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=100&q=80" alt="Baby" className="avatar-small" />
+          <img src={settings?.profileImage || "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=100&q=80"} alt="Baby" className="avatar-small" onError={(e) => { e.target.onerror = null; e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23d8dbd6"/></svg>' }} />
         </div>
       </header>
 

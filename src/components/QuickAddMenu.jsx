@@ -25,6 +25,8 @@ export default function QuickAddMenu({ onClose }) {
       navigate('/log/medicine');
     } else if (actionId === 'bath') {
       navigate('/log/bath');
+    } else if (actionId === 'tummy') {
+      navigate('/log/tummy');
     } else {
       await addEvent({ type: actionId });
     }

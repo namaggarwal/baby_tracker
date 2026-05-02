@@ -1,10 +1,12 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addEvent } from '../hooks/useEvents';
+import { useSettings } from '../hooks/useSettings';
 import './LogNappy.css';
 
 export default function LogNappy() {
   const navigate = useNavigate();
+  const { settings } = useSettings();
   const timeInputRef = useRef(null);
   const [type, setType] = useState('wet'); // 'wet' | 'dirty' | 'mixed'
   const [size, setSize] = useState('M'); // S, M, L
@@ -52,7 +54,7 @@ export default function LogNappy() {
         </button>
         <h2>Log Nappy</h2>
         <div className="avatar-placeholder-small">
-          <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=100&q=80" alt="Baby" className="avatar-small" />
+          <img src={settings?.profileImage || "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=100&q=80"} alt="Baby" className="avatar-small" onError={(e) => { e.target.onerror = null; e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="%23d8dbd6"/></svg>' }} />
         </div>
       </header>
 

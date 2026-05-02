@@ -223,6 +223,7 @@ textarea::placeholder {
   background: linear-gradient(to top, rgba(253, 249, 240, 1) 80%, rgba(253, 249, 240, 0));
   display: flex;
   justify-content: center;
+  z-index: 100;
 }
 
 .save-btn {

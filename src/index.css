@@ -22,6 +22,8 @@
   --color-on-tertiary: #ffffff;
   --color-background: #f7faf5; /* Warm Cream approx */
   --color-on-background: #191c1a;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
   
   --color-sage: #436444; /* Primary */
   --color-lavender: #61597e; /* Secondary */

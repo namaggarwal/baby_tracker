@@ -9,6 +9,7 @@ import LogNappy from './pages/LogNappy';
 import LogSleep from './pages/LogSleep';
 import LogMedicine from './pages/LogMedicine';
 import LogBath from './pages/LogBath';
+import LogTummy from './pages/LogTummy';
 import './App.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/log/sleep" element={<LogSleep />} />
         <Route path="/log/medicine" element={<LogMedicine />} />
         <Route path="/log/bath" element={<LogBath />} />
+        <Route path="/log/tummy" element={<LogTummy />} />
       </Routes>
     </BrowserRouter>
   );

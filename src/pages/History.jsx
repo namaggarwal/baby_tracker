@@ -25,6 +25,7 @@ export default function History() {
     if (event.type === 'feed') details = ` (${event.subtype} ${event.quantity_ml}ml)`;
     if (event.type === 'medicine') details = ` (${event.subtype} ${event.dosage})`;
     if (event.type === 'diaper') details = ` (${event.subtype || 'wet'})`;
+    if (event.type === 'tummy') details = ` (${event.duration})`;
     return `Are you sure you want to delete the ${event.type} log from ${time}${details}? This action cannot be undone.`;
   };
 
@@ -101,6 +102,11 @@ export default function History() {
                       ) : event.type === 'medicine' ? (
                         <>
                           <span>Dosage: {event.dosage}</span>
+                          {event.notes && <div style={{ fontStyle: 'italic', marginTop: '4px', opacity: 0.8 }}>"{event.notes}"</div>}
+                        </>
+                      ) : event.type === 'tummy' ? (
+                        <>
+                          <span>Duration: {event.duration}</span>
                           {event.notes && <div style={{ fontStyle: 'italic', marginTop: '4px', opacity: 0.8 }}>"{event.notes}"</div>}
                         </>
                       ) : (

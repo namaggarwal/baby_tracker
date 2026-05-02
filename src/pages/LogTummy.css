@@ -1,0 +1,195 @@
+.tummy-timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  margin: 16px 0;
+}
+
+.timer-circle-outer {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-circle-inner {
+  width: 200px;
+  height: 200px;
+  background: var(--color-surface-container-lowest);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--color-surface-container);
+  box-shadow: 0 0 40px -10px rgba(67, 100, 68, 0.15);
+  z-index: 2;
+}
+
+.timer-display {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--color-primary);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -2px;
+}
+
+.timer-label {
+  font-size: 14px;
+  color: var(--color-on-surface-variant);
+  margin-top: 8px;
+}
+
+.timer-actions {
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.timer-btn {
+  width: 100%;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.timer-btn.start {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: var(--shadow-level-2);
+}
+
+.timer-btn.stop {
+  background: var(--color-error);
+  color: white;
+}
+
+.goal-tracker {
+  background: var(--color-surface-container-low);
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.goal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.goal-progress-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 12px;
+  background: var(--color-surface-container-high);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--color-primary-container);
+  border-radius: var(--radius-pill);
+  transition: width 0.5s ease;
+}
+
+.goal-footer {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--color-on-surface-variant);
+}
+
+.manual-log-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.manual-log-row:active {
+  background: var(--color-surface-container-high);
+}
+
+.manual-log-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.manual-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--color-primary-fixed);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-on-primary-fixed);
+}
+
+.tip-card {
+  position: relative;
+  height: 192px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-top: 16px;
+}
+
+.tip-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tip-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(67, 100, 68, 0.6), transparent);
+}
+
+.tip-content {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  color: white;
+}
+
+.tip-label {
+  font-size: 12px;
+  opacity: 0.9;
+  display: block;
+}
+
+.tip-text {
+  font-size: 18px;
+  font-weight: 600;
+}
