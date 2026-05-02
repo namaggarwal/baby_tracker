@@ -2,54 +2,318 @@
   padding-top: var(--spacing-container-margin);
 }
 
-.insights-card {
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.tab-switcher {
+  display: flex;
   background: var(--color-surface-container);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+}
+
+.tab-switcher button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  color: var(--color-on-surface-variant);
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.tab-switcher button.active {
+  background: white;
+  color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-on-surface-variant);
+  margin-bottom: 32px;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-gutter);
+}
+
+@media (min-width: 768px) {
+  .insights-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .full-width {
+    grid-column: span 2;
+  }
+}
+
+.insight-card {
   border-radius: var(--radius-lg);
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 280px;
+  box-shadow: var(--shadow-level-1);
+}
+
+.sleep-card {
+  background: var(--color-secondary-container);
+  color: var(--color-on-secondary-container);
+}
+
+.feeding-card {
+  background: var(--color-primary-container);
+  color: white;
+}
+
+.diaper-card {
+  background: var(--color-tertiary);
+  color: white;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 24px;
 }
 
-.insights-card h3 {
-  font-size: 16px;
-  margin-bottom: 20px;
-  color: var(--color-on-surface-variant);
+.icon-title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+.icon-title h3 {
+  font-size: 24px;
+  margin: 0;
+  color: inherit;
 }
 
-.stat-box {
-  background: var(--color-surface);
-  border-radius: var(--radius-md);
-  padding: 20px 10px;
+.stat-summary {
+  text-align: right;
+}
+
+.stat-summary .value {
+  display: block;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-summary .label {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.chart-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 100px;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.chart-bar-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  border-top: 4px solid;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
 }
 
-.stat-value {
-  font-size: 32px;
+.chart-bar {
+  width: 100%;
+  max-width: 12px;
+  background: var(--color-secondary);
+  border-radius: var(--radius-pill);
+  transition: height 0.5s ease;
+}
+
+.bar-label {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.6;
+}
+
+.nap-details {
+  margin-top: 16px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.nap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nap-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+.nap-time {
+  font-weight: 600;
+}
+
+.nap-duration {
+  opacity: 0.8;
+}
+
+.more-naps {
+  font-size: 11px;
+  text-align: center;
+  opacity: 0.6;
+  margin-top: 4px;
+}
+
+.no-data {
+  text-align: center;
+  opacity: 0.6;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.rings-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ring-stat {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-ring-mini {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
   font-weight: 700;
-  color: var(--color-on-surface);
+}
+
+.ring-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.card-header-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.card-subtitle {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.diaper-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.diaper-pill {
+  flex: 1;
+  min-width: 120px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pill-label {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.pill-value-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pill-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.pill-icon {
+  font-size: 20px !important;
+  opacity: 0.4;
+}
+
+.note-card {
+  background: var(--color-surface-container-low);
+  border: 1px solid var(--color-surface-container-high);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.note-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(67, 100, 68, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.note-content h4 {
+  font-size: 18px;
   margin-bottom: 4px;
 }
 
-.stat-label {
+.note-content p {
   font-size: 14px;
   color: var(--color-on-surface-variant);
+  line-height: 1.6;
 }
 
-.coming-soon-banner {
-  background: var(--color-surface-container-low);
-  border: 1px dashed var(--color-outline-variant);
-  border-radius: var(--radius-lg);
-  padding: 32px;
-  text-align: center;
-  color: var(--color-on-surface-variant);
-  font-size: 14px;
-}
+.icon-secondary { color: var(--color-secondary); }
+.icon-primary { color: white; }
+.icon-white { color: white; font-size: 32px !important; }
