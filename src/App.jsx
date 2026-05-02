@@ -10,26 +10,29 @@ import LogSleep from './pages/LogSleep';
 import LogMedicine from './pages/LogMedicine';
 import LogBath from './pages/LogBath';
 import LogTummy from './pages/LogTummy';
+import { ToastProvider } from './context/ToastContext';
 import './App.css';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<AppShell />}>
-          <Route index element={<Home />} />
-          <Route path="history" element={<History />} />
-          <Route path="insights" element={<Insights />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
-        <Route path="/log/feed" element={<LogFeed />} />
-        <Route path="/log/nappy" element={<LogNappy />} />
-        <Route path="/log/sleep" element={<LogSleep />} />
-        <Route path="/log/medicine" element={<LogMedicine />} />
-        <Route path="/log/bath" element={<LogBath />} />
-        <Route path="/log/tummy" element={<LogTummy />} />
-      </Routes>
-    </BrowserRouter>
+    <ToastProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<AppShell />}>
+            <Route index element={<Home />} />
+            <Route path="history" element={<History />} />
+            <Route path="insights" element={<Insights />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+          <Route path="/log/feed" element={<LogFeed />} />
+          <Route path="/log/nappy" element={<LogNappy />} />
+          <Route path="/log/sleep" element={<LogSleep />} />
+          <Route path="/log/medicine" element={<LogMedicine />} />
+          <Route path="/log/bath" element={<LogBath />} />
+          <Route path="/log/tummy" element={<LogTummy />} />
+        </Routes>
+      </BrowserRouter>
+    </ToastProvider>
   );
 }
 

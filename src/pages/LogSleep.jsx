@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addEvent, useEvents, updateEvent } from '../hooks/useEvents';
+import { useToast } from '../context/ToastContext';
 import './LogSleep.css';
 
 export default function LogSleep() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const startTimeRef = useRef(null);
   const endTimeRef = useRef(null);
   
@@ -73,6 +75,7 @@ export default function LogSleep() {
         duration,
         notes
       });
+      showToast('Nap session finished!');
     } else {
       // Starting a new sleep
       const eventData = {
@@ -82,6 +85,7 @@ export default function LogSleep() {
         notes,
       };
       await addEvent(eventData);
+      showToast('Nap session started!');
     }
     navigate('/');
   };

@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { addEvent, useEvents } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
 import { formatTime } from '../utils/timeFormat';
+import { useToast } from '../context/ToastContext';
 import './LogFeed.css';
 
 export default function LogFeed() {
   const navigate = useNavigate();
   const events = useEvents();
   const { settings } = useSettings();
+  const { showToast } = useToast();
   const lastFeed = events?.find(e => e.type === 'feed');
   const lastQuantity = lastFeed?.quantity_ml ? `${lastFeed.quantity_ml}ml` : '--ml';
   const timeInputRef = useRef(null);
@@ -48,6 +50,7 @@ export default function LogFeed() {
       timestamp: now.toISOString(),
     };
     await addEvent(eventData);
+    showToast('Feeding session logged!');
     navigate('/');
   };
 

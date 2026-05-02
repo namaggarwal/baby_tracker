@@ -2,11 +2,13 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addEvent } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
+import { useToast } from '../context/ToastContext';
 import './LogNappy.css';
 
 export default function LogNappy() {
   const navigate = useNavigate();
   const { settings } = useSettings();
+  const { showToast } = useToast();
   const timeInputRef = useRef(null);
   const [type, setType] = useState('wet'); // 'wet' | 'dirty' | 'mixed'
   const [size, setSize] = useState('M'); // S, M, L
@@ -43,6 +45,7 @@ export default function LogNappy() {
       timestamp: now.toISOString(),
     };
     await addEvent(eventData);
+    showToast('Nappy change logged!');
     navigate('/');
   };
 

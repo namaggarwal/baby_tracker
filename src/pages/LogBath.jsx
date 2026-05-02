@@ -5,10 +5,12 @@ import { useSettings } from '../hooks/useSettings';
 import { formatTime } from '../utils/timeFormat';
 import './LogFeed.css'; // Shared layout
 import './LogBath.css';
+import { useToast } from '../context/ToastContext';
 
 export default function LogBath() {
   const navigate = useNavigate();
   const { settings } = useSettings();
+  const { showToast } = useToast();
   const timeInputRef = useRef(null);
   const [notes, setNotes] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
@@ -41,6 +43,7 @@ export default function LogBath() {
       notes: finalNotes,
       timestamp: now.toISOString(),
     });
+    showToast('Bath time logged!');
     navigate('/');
   };
 

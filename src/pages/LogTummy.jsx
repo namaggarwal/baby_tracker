@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addEvent, useEvents } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
+import { useToast } from '../context/ToastContext';
 import './LogTummy.css';
 
 export default function LogTummy() {
   const navigate = useNavigate();
   const events = useEvents();
   const { settings } = useSettings();
+  const { showToast } = useToast();
   const [entryMode, setEntryMode] = useState('timer'); // 'timer' or 'manual'
   const [isActive, setIsActive] = useState(false);
   const [seconds, setSeconds] = useState(0);
@@ -52,6 +54,7 @@ export default function LogTummy() {
       notes: notes,
       timestamp: customTimestamp || new Date().toISOString(),
     });
+    showToast('Tummy time logged!');
     setIsActive(false);
     setSeconds(0);
     navigate('/');

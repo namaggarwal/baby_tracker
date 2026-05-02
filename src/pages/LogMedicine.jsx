@@ -2,12 +2,14 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addEvent } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
+import { useToast } from '../context/ToastContext';
 import './LogFeed.css'; // Reusing some shared layout styles
 import './LogMedicine.css';
 
 export default function LogMedicine() {
   const navigate = useNavigate();
   const { settings } = useSettings();
+  const { showToast } = useToast();
   const timeInputRef = useRef(null);
   const [medicineName, setMedicineName] = useState('Vitamin D');
   const [dosage, setDosage] = useState('1');
@@ -36,6 +38,7 @@ export default function LogMedicine() {
       timestamp: now.toISOString(),
     };
     await addEvent(eventData);
+    showToast(`${medicineName} log saved!`);
     navigate('/');
   };
 
