@@ -145,8 +145,8 @@ export default function LogFeed() {
             <span className="time-label">Time of feeding</span>
             <span className="time-value">{displayTime}</span>
           </div>
-          <div style={{ position: 'relative' }}>
-            <button className="change-btn" onClick={() => timeInputRef.current?.showPicker && timeInputRef.current.showPicker()}>
+          <div className="time-picker-wrapper" style={{ position: 'relative' }}>
+            <button className="change-btn" style={{ pointerEvents: 'none' }}>
               <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>schedule</span> Change
             </button>
             <input 
@@ -154,14 +154,16 @@ export default function LogFeed() {
               ref={timeInputRef}
               value={time}
               onChange={(e) => setTime(e.target.value)}
+              onClick={(e) => e.target.showPicker && e.target.showPicker()}
               style={{
                 position: 'absolute',
-                bottom: 0,
-                right: 0,
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
                 opacity: 0,
-                pointerEvents: 'none',
-                width: '10px',
-                height: '10px'
+                cursor: 'pointer',
+                border: 'none'
               }}
             />
           </div>

@@ -146,6 +146,7 @@ export default function LogTummy() {
                   type="time" 
                   value={manualTime} 
                   onChange={(e) => setManualTime(e.target.value)}
+                  onClick={(e) => e.target.showPicker && e.target.showPicker()}
                   style={{ border: 'none', background: 'transparent', fontSize: '20px', fontWeight: '700', color: 'var(--color-primary)', outline: 'none' }}
                 />
               </div>

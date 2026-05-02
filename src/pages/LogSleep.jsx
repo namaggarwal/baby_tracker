@@ -126,32 +126,60 @@ export default function LogSleep() {
           <div className="time-row">
             <div className="time-col">
               <span className="col-label">Start Time</span>
-              <div className="time-input-container" onClick={() => startTimeRef.current?.showPicker && startTimeRef.current.showPicker()}>
+              <div className="time-input-container">
                 <span className="display-time">{displayStart}</span>
-                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>schedule</span>
-                <input 
-                  type="time" 
-                  ref={startTimeRef} 
-                  value={startTime} 
-                  onChange={(e) => setStartTime(e.target.value)} 
-                  className="hidden-time-input" 
-                />
+                <div className="time-picker-wrapper" style={{ position: 'relative' }}>
+                  <button className="change-btn" style={{ pointerEvents: 'none' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>schedule</span> Change
+                  </button>
+                  <input 
+                    type="time" 
+                    ref={startTimeRef} 
+                    value={startTime} 
+                    onChange={(e) => setStartTime(e.target.value)} 
+                    onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      opacity: 0,
+                      cursor: 'pointer',
+                      border: 'none'
+                    }}
+                  />
+                </div>
               </div>
             </div>
             
             {activeSleep && (
               <div className="time-col">
                 <span className="col-label">End Time</span>
-                <div className="time-input-container" onClick={() => endTimeRef.current?.showPicker && endTimeRef.current.showPicker()}>
+                <div className="time-input-container">
                   <span className="display-time">{displayEnd}</span>
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>schedule</span>
-                  <input 
-                    type="time" 
-                    ref={endTimeRef} 
-                    value={endTime} 
-                    onChange={(e) => setEndTime(e.target.value)} 
-                    className="hidden-time-input"
-                  />
+                  <div className="time-picker-wrapper" style={{ position: 'relative' }}>
+                    <button className="change-btn" style={{ pointerEvents: 'none' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>schedule</span> Change
+                    </button>
+                    <input 
+                      type="time" 
+                      ref={endTimeRef} 
+                      value={endTime} 
+                      onChange={(e) => setEndTime(e.target.value)} 
+                      onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        opacity: 0,
+                        cursor: 'pointer',
+                        border: 'none'
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             )}
