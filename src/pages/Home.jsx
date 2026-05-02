@@ -20,6 +20,27 @@ export default function Home() {
     new Date(e.timestamp).toLocaleDateString() === new Date().toLocaleDateString()
   ).length || 0;
 
+  const lastFeed = events?.find(e => e.type === 'feed');
+  const feedInterval = parseFloat(settings?.feedingInterval || 3);
+  const nextFeedingTime = lastFeed 
+    ? new Date(new Date(lastFeed.timestamp).getTime() + feedInterval * 60 * 60 * 1000)
+    : null;
+
+  const lastDiaper = events?.find(e => e.type === 'diaper');
+  const nappyInterval = parseFloat(settings?.nappyInterval || 3);
+  const nextDiaperTime = lastDiaper
+    ? new Date(new Date(lastDiaper.timestamp).getTime() + nappyInterval * 60 * 60 * 1000)
+    : null;
+
+  const [activeSuggestion, setActiveSuggestion] = useState('feed');
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSuggestion(prev => prev === 'feed' ? 'nappy' : 'feed');
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const updateTimer = () => {
       const referenceTime = isSleeping 
@@ -104,24 +125,41 @@ export default function Home() {
             color: isSleeping ? '#625a7f' : '#424841' 
           }}>history</span>
           {isSleeping ? (
-            <span>Started at {new Date(lastSleep.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • Nap {sleepsToday} of the day</span>
+            <span>Started at {formatTime(lastSleep.timestamp, settings?.timeFormat)} • Nap {sleepsToday} of the day</span>
           ) : (
-            <span>{lastSleep ? `Woke up at ${new Date(lastSleep.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'No sleep records yet'}</span>
+            <span>{lastSleep ? `Woke up at ${formatTime(lastSleep.endTime, settings?.timeFormat)}` : 'No sleep records yet'}</span>
           )}
         </div>
       </section>
 
-      {/* Suggested next feeding */}
-      <section className="suggestion-card">
+      {/* Suggested next action (Rotating) */}
+      <section 
+        className={`suggestion-card suggestion-fade ${activeSuggestion}`} 
+        onClick={() => navigate(activeSuggestion === 'feed' ? '/log/feed' : '/log/nappy')}
+        key={activeSuggestion}
+      >
         <div className="suggestion-icon-circle">
-          <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#2e4e30' }}>nutrition</span>
+          <span className="material-symbols-outlined material-icons-filled" style={{ 
+            fontSize: '24px', 
+            color: activeSuggestion === 'feed' ? '#2e4e30' : '#c2b280' 
+          }}>
+            {activeSuggestion === 'feed' ? 'nutrition' : 'water_drop'}
+          </span>
         </div>
         <div className="suggestion-text">
-          <span>Next feeding suggested around</span>
-          <strong>4:30 PM</strong>
+          <span>Next {activeSuggestion === 'feed' ? 'feeding' : 'nappy change'} suggested around</span>
+          <strong>
+            {activeSuggestion === 'feed' 
+              ? (nextFeedingTime ? formatTime(nextFeedingTime, settings?.timeFormat) : 'No feeds logged')
+              : (nextDiaperTime ? formatTime(nextDiaperTime, settings?.timeFormat) : 'No nappies logged')
+            }
+          </strong>
         </div>
         <div className="suggestion-chevron">
-           <span className="material-symbols-outlined" style={{ fontSize: '24px', color: '#2e4e30' }}>chevron_right</span>
+           <span className="material-symbols-outlined" style={{ 
+             fontSize: '24px', 
+             color: activeSuggestion === 'feed' ? '#2e4e30' : '#c2b280' 
+           }}>chevron_right</span>
         </div>
       </section>
 

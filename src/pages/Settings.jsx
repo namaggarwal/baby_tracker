@@ -107,6 +107,43 @@ export default function Settings() {
           </div>
         </div>
       </section>
+
+      <section className="settings-section">
+        <h3>Reminders & Suggestions</h3>
+        <div className="setting-item">
+          <label>Feeding Interval (Hours)</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px' }}>
+            <input 
+              type="range" 
+              min="1" 
+              max="8" 
+              step="0.5"
+              value={settings?.feedingInterval || 3} 
+              onChange={(e) => updateSetting('feedingInterval', parseFloat(e.target.value))}
+              style={{ flex: 1, accentColor: 'var(--color-primary)' }}
+            />
+            <span style={{ minWidth: '45px', fontWeight: '700', color: 'var(--color-primary)' }}>{settings?.feedingInterval || 3}h</span>
+          </div>
+          <p className="setting-description">Recommend next feed after this interval.</p>
+        </div>
+
+        <div className="setting-item">
+          <label>Nappy Change Interval (Hours)</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px' }}>
+            <input 
+              type="range" 
+              min="1" 
+              max="8" 
+              step="0.5"
+              value={settings?.nappyInterval || 3} 
+              onChange={(e) => updateSetting('nappyInterval', parseFloat(e.target.value))}
+              style={{ flex: 1, accentColor: 'var(--color-primary)' }}
+            />
+            <span style={{ minWidth: '45px', fontWeight: '700', color: 'var(--color-primary)' }}>{settings?.nappyInterval || 3}h</span>
+          </div>
+          <p className="setting-description">Recommend next change after this interval.</p>
+        </div>
+      </section>
       
       <section className="settings-section">
         <h3>Data & Sync</h3>
