@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { syncToCloud } from '../utils/sync';
+import { syncToCloud, deleteFromCloud } from '../utils/sync';
 
 export function useEvents(type = null) {
   return useLiveQuery(
@@ -36,7 +36,8 @@ export async function updateEvent(id, changes) {
 }
 
 export async function deleteEvent(id) {
-  return await db.events.delete(id);
+  await db.events.delete(id);
+  deleteFromCloud(id);
 }
 
 export async function clearAllEvents() {

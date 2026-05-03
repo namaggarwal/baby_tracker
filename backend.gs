@@ -46,6 +46,21 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
     }
 
+    // Handle delete
+    if (data.type === 'delete_event') {
+      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const sheet = ss.getSheetByName(EVENTS_SHEET);
+      const values = sheet.getDataRange().getValues();
+      for (let i = 1; i < values.length; i++) {
+        if (String(values[i][0]) === String(data.id)) {
+          sheet.deleteRow(i + 1);
+          break;
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     const sheetName = data.type === 'settings_update' ? SETTINGS_SHEET : EVENTS_SHEET;
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     const sheet = ss.getSheetByName(sheetName);

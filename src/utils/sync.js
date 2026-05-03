@@ -86,3 +86,23 @@ export async function fetchFromCloud() {
     return false;
   }
 }
+
+export async function deleteFromCloud(id) {
+  if (!CONFIG.GOOGLE_SHEETS_URL || CONFIG.GOOGLE_SHEETS_URL.includes('REPLACE_WITH_YOUR_URL')) {
+    return;
+  }
+
+  const passwordSetting = await db.settings.get('syncPassword');
+  const password = passwordSetting?.value || '';
+
+  try {
+    await fetch(CONFIG.GOOGLE_SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'delete_event', id, password }),
+    });
+  } catch (error) {
+    console.error('Delete sync failed:', error);
+  }
+}
