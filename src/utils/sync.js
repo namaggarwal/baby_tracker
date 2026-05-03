@@ -14,8 +14,6 @@ export async function syncToCloud(isSettings = false, settingsData = null) {
     try {
       await fetch(CONFIG.GOOGLE_SHEETS_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       return true;
@@ -34,7 +32,6 @@ export async function syncToCloud(isSettings = false, settingsData = null) {
   try {
     const res = await fetch(CONFIG.GOOGLE_SHEETS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
 
@@ -44,11 +41,13 @@ export async function syncToCloud(isSettings = false, settingsData = null) {
     try { result = JSON.parse(text); } catch (e) { result = { status: 'success' }; }
 
     if (result.status !== 'error') {
+      console.log('Sync operations successful');
       const ids = operations.map(op => op.id);
       await db.syncQueue.bulkDelete(ids);
       await db.settings.put({ key: 'lastSync', value: new Date().toISOString() });
       return true;
     }
+    console.warn('Sync operations failed on server:', result.message);
     return false;
   } catch (error) {
     console.error('Sync failed:', error);
@@ -101,15 +100,32 @@ export async function fetchFromCloud() {
           }
 
           const type = String(findKey(e, 'type') || '').toLowerCase();
-          const timestamp = Number(findKey(e, 'lastupdated') || findKey(e, 'timestamp'));
-          const endTime = Number(findKey(e, 'endtime'));
+          
+          // Prioritize original event timestamp over sync time (lastupdated)
+          let ts = Number(findKey(e, 'timestamp'));
+          if (isNaN(ts) || ts <= 0) {
+            ts = new Date(findKey(e, 'timestamp')).getTime();
+          }
+          if (isNaN(ts) || ts <= 0) {
+            ts = Number(findKey(e, 'lastupdated'));
+          }
+          if (isNaN(ts) || ts <= 0) {
+            ts = new Date(findKey(e, 'lastupdated')).getTime();
+          }
+          if (isNaN(ts) || ts <= 0) ts = Date.now();
+
+          let et = Number(findKey(e, 'endtime'));
+          if (isNaN(et) || et <= 0) {
+            et = new Date(findKey(e, 'endtime')).getTime();
+          }
+          if (isNaN(et) || et <= 0) et = undefined;
 
           return {
             syncId,
             type,
             subtype: findKey(e, 'subtype') || undefined,
-            timestamp: !isNaN(timestamp) && timestamp > 0 ? timestamp : Date.now(),
-            endTime: !isNaN(endTime) && endTime > 0 ? endTime : undefined,
+            timestamp: ts,
+            endTime: et,
             duration: findKey(e, 'duration') || undefined,
             notes: findKey(e, 'notes') || undefined,
             size: findKey(e, 'size') || undefined,

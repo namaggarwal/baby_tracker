@@ -104,27 +104,29 @@ function handleSyncOperations(ss, data) {
     const rowIndex = rowMap.get(String(op.syncId));
     const now = Date.now();
     
-    const rowData = [
-      payload.syncId || op.syncId,
-      payload.timestamp || now,
-      payload.endTime || '',
-      payload.type || '',
-      payload.subtype || '',
-      payload.duration || '',
-      payload.notes || '',
-      payload.size || '',
-      payload.quantity_ml || '',
-      payload.side || '',
-      payload.dosage || '',
-      payload.status || 'ACTIVE',
-      now,
-      payload.version || 1
-    ];
+    // Header-aware mapping ensures data goes to the right column
+    const newRow = headers.map(header => {
+      if (header === 'syncid') return payload.syncId || op.syncId;
+      if (header === 'timestamp') return payload.timestamp || now;
+      if (header === 'endtime') return payload.endTime || '';
+      if (header === 'type') return payload.type || '';
+      if (header === 'subtype') return payload.subtype || '';
+      if (header === 'duration') return payload.duration || '';
+      if (header === 'notes') return payload.notes || '';
+      if (header === 'size') return payload.size || '';
+      if (header === 'quantity' || header === 'quantity_ml') return payload.quantity_ml || '';
+      if (header === 'side') return payload.side || '';
+      if (header === 'dosage') return payload.dosage || '';
+      if (header === 'status') return payload.status || 'ACTIVE';
+      if (header === 'lastupdated') return now;
+      if (header === 'version') return payload.version || 1;
+      return '';
+    });
 
     if (rowIndex) {
-      sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+      sheet.getRange(rowIndex, 1, 1, newRow.length).setValues([newRow]);
     } else {
-      sheet.appendRow(rowData);
+      sheet.appendRow(newRow);
     }
   });
   
