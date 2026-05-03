@@ -90,6 +90,8 @@ function handleFetchDelta(ss, data) {
 
 function handleSyncOperations(ss, data) {
   const sheet = ss.getSheetByName(EVENTS_SHEET);
+  if (!sheet) return createJsonResponse({ status: 'error', message: 'Sheet not found' });
+  
   const values = sheet.getDataRange().getValues();
   const headers = values[0].map(h => String(h).toLowerCase().replace(/\s+/g, ''));
   const syncIdIdx = headers.indexOf('syncid');
@@ -104,22 +106,35 @@ function handleSyncOperations(ss, data) {
     const rowIndex = rowMap.get(String(op.syncId));
     const now = Date.now();
     
-    // Header-aware mapping ensures data goes to the right column
-    const newRow = headers.map(header => {
-      if (header === 'syncid') return payload.syncId || op.syncId;
-      if (header === 'timestamp') return payload.timestamp || now;
-      if (header === 'endtime') return payload.endTime || '';
-      if (header === 'type') return payload.type || '';
-      if (header === 'subtype') return payload.subtype || '';
-      if (header === 'duration') return payload.duration || '';
-      if (header === 'notes') return payload.notes || '';
-      if (header === 'size') return payload.size || '';
-      if (header === 'quantity' || header === 'quantity_ml') return payload.quantity_ml || '';
-      if (header === 'side') return payload.side || '';
-      if (header === 'dosage') return payload.dosage || '';
-      if (header === 'status') return payload.status || 'ACTIVE';
+    let existingRow = [];
+    if (rowIndex) {
+      existingRow = sheet.getRange(rowIndex, 1, 1, headers.length).getValues()[0];
+    }
+
+    const newRow = headers.map((header, i) => {
+      // 1. Always update LastUpdated
       if (header === 'lastupdated') return now;
+      
+      // 2. Identify the field in the payload (if present)
+      if (payload.hasOwnProperty(header)) return payload[header];
+      
+      // Special mapping for quantity vs quantity_ml
+      if (header === 'quantity' || header === 'quantity_ml') {
+        if (payload.hasOwnProperty('quantity_ml')) return payload.quantity_ml;
+        if (payload.hasOwnProperty('quantity')) return payload.quantity;
+      }
+
+      // 3. For existing rows, preserve EVERYTHING ELSE exactly as is
+      if (rowIndex && existingRow[i] !== undefined && existingRow[i] !== null && existingRow[i] !== '') {
+        return existingRow[i];
+      }
+
+      // 4. Fallback defaults ONLY for brand new rows
+      if (header === 'syncid') return payload.syncId || op.syncId;
+      if (header === 'status') return payload.status || 'ACTIVE';
+      if (header === 'timestamp') return payload.timestamp || now;
       if (header === 'version') return payload.version || 1;
+      
       return '';
     });
 
