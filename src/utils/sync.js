@@ -9,9 +9,17 @@ export async function syncToCloud(data, isSettings = false) {
   const passwordSetting = await db.settings.get('syncPassword');
   const password = passwordSetting?.value || '';
 
-  const payload = isSettings 
-    ? { type: 'settings_update', settings: data, password }
-    : { ...data, password };
+  let payload;
+  if (isSettings) {
+    payload = { type: 'settings_update', settings: data, password };
+  } else {
+    payload = { 
+      ...data, 
+      password,
+      timestamp: data.timestamp ? new Date(data.timestamp).toISOString() : '',
+      endTime: data.endTime ? new Date(data.endTime).toISOString() : ''
+    };
+  }
 
   try {
     await fetch(CONFIG.GOOGLE_SHEETS_URL, {
@@ -53,13 +61,49 @@ export async function fetchFromCloud() {
     if (remoteEvents.status === 'error') throw new Error(remoteEvents.message);
     
     if (Array.isArray(remoteEvents) && remoteEvents.length > 0) {
-      const formattedEvents = remoteEvents.map(e => ({
-        ...e,
-        quantity_ml: e.quantity ? parseInt(e.quantity) : undefined,
-        endTime: e.endtime || undefined,
-        timestamp: e.timestamp
-      }));
-      await db.events.bulkPut(formattedEvents);
+      const existingEvents = await db.events.toArray();
+      const existingMap = new Map(existingEvents.map(e => [e.syncId, e]));
+
+      const formattedEvents = remoteEvents
+        .filter(e => e.syncid || e.id)
+        .map(e => {
+          const syncId = e.syncid || String(e.id);
+          const existing = existingMap.get(syncId);
+          
+          let ts = existing?.timestamp || Date.now();
+          if (e.timestamp) {
+            let parsedTs = Number(e.timestamp);
+            if (isNaN(parsedTs)) parsedTs = new Date(e.timestamp).getTime();
+            if (!isNaN(parsedTs)) ts = parsedTs;
+          }
+          
+          let et = existing?.endTime || undefined;
+          if (e.endtime) {
+            let parsedEt = Number(e.endtime);
+            if (isNaN(parsedEt)) parsedEt = new Date(e.endtime).getTime();
+            if (!isNaN(parsedEt)) et = parsedEt;
+          }
+
+          return {
+            syncId,
+            type: e.type,
+            subtype: e.subtype || undefined,
+            timestamp: ts,
+            endTime: et,
+            duration: e.duration || undefined,
+            notes: e.notes || undefined,
+            size: e.size || undefined,
+            quantity_ml: e.quantity ? parseInt(e.quantity) : undefined,
+            side: e.side || undefined,
+            dosage: e.dosage || undefined,
+            synced: true,
+          };
+        });
+      try {
+        await db.events.bulkPut(formattedEvents);
+      } catch (err) {
+        console.error('bulkPut events failed:', err);
+      }
     }
 
     // 2. Fetch Settings using POST for security

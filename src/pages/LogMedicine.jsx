@@ -35,7 +35,7 @@ export default function LogMedicine() {
       subtype: medicineName,
       dosage: `${dosage} ${unit}`,
       notes,
-      timestamp: now.toISOString(),
+      timestamp: now.getTime(),
     };
     await addEvent(eventData);
     showToast(`${medicineName} log saved!`);

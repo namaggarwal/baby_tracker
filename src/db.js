@@ -1,8 +1,9 @@
 import Dexie from 'dexie';
 
-export const db = new Dexie('BabyTrackDB');
+// New DB name forces a clean start with syncId as primary key
+export const db = new Dexie('BabyTrackDB_v2');
 
 db.version(1).stores({
-  events: '++id, type, timestamp, synced',
+  events: 'syncId, type, timestamp, synced',
   settings: 'key'
 });

@@ -41,7 +41,7 @@ export default function LogBath() {
     await addEvent({
       type: 'bath',
       notes: finalNotes,
-      timestamp: now.toISOString(),
+      timestamp: now.getTime(),
     });
     showToast('Bath time logged!');
     navigate('/');

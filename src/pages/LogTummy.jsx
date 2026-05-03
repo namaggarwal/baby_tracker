@@ -52,7 +52,7 @@ export default function LogTummy() {
       type: 'tummy',
       duration: `${duration} min`,
       notes: notes,
-      timestamp: customTimestamp || new Date().toISOString(),
+      timestamp: customTimestamp || Date.now(),
     });
     showToast('Tummy time logged!');
     setIsActive(false);
@@ -64,7 +64,7 @@ export default function LogTummy() {
     const now = new Date();
     const [hours, minutes] = manualTime.split(':');
     now.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
-    saveSession(manualMins, 'Manual entry', now.toISOString());
+    saveSession(manualMins, 'Manual entry', now.getTime());
   };
 
   // Calculate today's progress

@@ -69,9 +69,9 @@ export default function LogSleep() {
       endDt.setHours(parseInt(endH, 10), parseInt(endM, 10), 0, 0);
       if (endDt < startDt) endDt.setDate(endDt.getDate() + 1);
 
-      await updateEvent(activeSleep.id, {
-        timestamp: startDt.toISOString(), // Allow updating start time if edited
-        endTime: endDt.toISOString(),
+      await updateEvent(activeSleep.syncId, {
+        timestamp: startDt.getTime(),
+        endTime: endDt.getTime(),
         duration,
         notes
       });
@@ -80,8 +80,8 @@ export default function LogSleep() {
       // Starting a new sleep
       const eventData = {
         type: 'sleep',
-        timestamp: startDt.toISOString(),
-        endTime: null, // Keep it open
+        timestamp: startDt.getTime(),
+        endTime: null,
         notes,
       };
       await addEvent(eventData);

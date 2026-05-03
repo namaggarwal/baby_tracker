@@ -42,7 +42,7 @@ export default function LogNappy() {
       subtype: type,
       size,
       notes,
-      timestamp: now.toISOString(),
+      timestamp: now.getTime(),
     };
     await addEvent(eventData);
     showToast('Nappy change logged!');

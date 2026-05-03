@@ -47,7 +47,7 @@ export default function LogFeed() {
       quantity_ml: type === 'breast' ? sizes.find(s => s.id === size).ml : quantity,
       side: type === 'breast' ? side : null,
       notes,
-      timestamp: now.toISOString(),
+      timestamp: now.getTime(),
     };
     await addEvent(eventData);
     showToast('Feeding session logged!');
