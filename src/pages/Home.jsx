@@ -1,39 +1,44 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useEvents } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
 import { useNavigate } from 'react-router-dom';
 import { formatTime, formatTimeRange } from '../utils/timeFormat';
 import './Home.css';
 
+// Move component outside to prevent remounts on every render
+const ProgressCard = ({ value, max, label, color, unit }) => {
+  const radius = 28;
+  const circumference = 2 * Math.PI * radius;
+  const safeValue = Math.min(value, max);
+  const strokeDashoffset = circumference - (safeValue / max) * circumference;
+
+  return (
+    <div className="progress-card">
+      <div className="progress-ring-wrapper">
+        <svg className="progress-ring" width="70" height="70">
+          <circle stroke="#e6e9e4" strokeWidth="6" fill="transparent" r={radius} cx="35" cy="35"/>
+          <circle stroke={color} strokeWidth="6" fill="transparent" r={radius} cx="35" cy="35"
+            style={{ strokeDasharray: circumference, strokeDashoffset, strokeLinecap: 'round', transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }} />
+        </svg>
+        <div className="progress-value">
+          <span className="current">{value}</span>
+          <span className="max">/ {max}{unit}</span>
+        </div>
+      </div>
+      <div className="progress-label">{label}</div>
+    </div>
+  );
+};
+
 export default function Home() {
   const navigate = useNavigate();
   const events = useEvents();
   const { settings } = useSettings();
   const babyName = settings?.babyName || 'Tara';
-
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
-  const lastSleep = events?.find(e => e.type === 'sleep');
-  const isSleeping = lastSleep && !lastSleep.endTime;
-
-  const sleepsToday = events?.filter(e => 
-    e.type === 'sleep' && 
-    new Date(e.timestamp).toLocaleDateString() === new Date().toLocaleDateString()
-  ).length || 0;
-
-  const lastFeed = events?.find(e => e.type === 'feed');
-  const feedInterval = parseFloat(settings?.feedingInterval || 3);
-  const nextFeedingTime = lastFeed 
-    ? new Date(new Date(lastFeed.timestamp).getTime() + feedInterval * 60 * 60 * 1000)
-    : null;
-
-  const lastDiaper = events?.find(e => e.type === 'diaper');
-  const nappyInterval = parseFloat(settings?.nappyInterval || 3);
-  const nextDiaperTime = lastDiaper
-    ? new Date(new Date(lastDiaper.timestamp).getTime() + nappyInterval * 60 * 60 * 1000)
-    : null;
-
   const [activeSuggestion, setActiveSuggestion] = useState('feed');
 
+  // Suggestion rotation
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveSuggestion(prev => prev === 'feed' ? 'nappy' : 'feed');
@@ -41,13 +46,48 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  // Memoize daily progress to avoid expensive filters on every tick
+  const dailyStats = useMemo(() => {
+    if (!events) return { sleepsToday: 0, tummyMins: 0, feedCount: 0, diaperCount: 0, todayEvents: [] };
+    
+    const todayStr = new Date().toDateString();
+    const todayArr = events.filter(e => e.timestamp && new Date(e.timestamp).toDateString() === todayStr);
+
+    return {
+      sleepsToday: todayArr.filter(e => e.type === 'sleep').length,
+      tummyMins: todayArr.filter(e => e.type === 'tummy').reduce((acc, e) => acc + (parseInt(e.duration) || 0), 0),
+      feedCount: todayArr.filter(e => e.type === 'feed').length,
+      diaperCount: todayArr.filter(e => e.type === 'diaper').length,
+      todayEvents: todayArr
+    };
+  }, [events]);
+
+  const { sleepsToday, tummyMins, feedCount, diaperCount } = dailyStats;
+
+  // Status and timers
+  const lastSleep = useMemo(() => events?.find(e => e.type === 'sleep'), [events]);
+  const isSleeping = !!(lastSleep && !lastSleep.endTime);
+
+  const lastFeed = useMemo(() => events?.find(e => e.type === 'feed'), [events]);
+  const lastDiaper = useMemo(() => events?.find(e => e.type === 'diaper'), [events]);
+
+  const feedInterval = parseFloat(settings?.feedingInterval || 3);
+  const nextFeedingTime = lastFeed?.timestamp 
+    ? new Date(new Date(lastFeed.timestamp).getTime() + feedInterval * 60 * 60 * 1000)
+    : null;
+
+  const nappyInterval = parseFloat(settings?.nappyInterval || 3);
+  const nextDiaperTime = lastDiaper?.timestamp
+    ? new Date(new Date(lastDiaper.timestamp).getTime() + nappyInterval * 60 * 60 * 1000)
+    : null;
+
   useEffect(() => {
     const updateTimer = () => {
       const referenceTime = isSleeping 
-        ? new Date(lastSleep.timestamp) 
+        ? (lastSleep?.timestamp ? new Date(lastSleep.timestamp) : null)
         : (lastSleep?.endTime ? new Date(lastSleep.endTime) : null);
 
-      if (referenceTime) {
+      if (referenceTime && !isNaN(referenceTime.getTime())) {
         const diff = Math.abs(new Date() - referenceTime);
         const hrs = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
         const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
@@ -61,47 +101,11 @@ export default function Home() {
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [isSleeping, lastSleep]);
-
-  // Daily Progress Calculations
-  const today = new Date().toDateString();
-  const todayEvents = events?.filter(e => new Date(e.timestamp).toDateString() === today) || [];
-
-  const tummyMins = todayEvents
-    .filter(e => e.type === 'tummy')
-    .reduce((acc, e) => acc + (parseInt(e.duration) || 0), 0);
-  
-  const feedCount = todayEvents.filter(e => e.type === 'feed').length;
-  const diaperCount = todayEvents.filter(e => e.type === 'diaper').length;
+  }, [isSleeping, lastSleep?.timestamp, lastSleep?.endTime]);
 
   const tummyGoal = settings?.tummyGoal || 30;
   const feedGoal = settings?.feedGoal || 8;
   const nappyGoal = settings?.nappyGoal || 6;
-
-  // Simple ring component for daily progress
-  const ProgressRing = ({ value, max, label, color, unit }) => {
-    const radius = 28;
-    const circumference = 2 * Math.PI * radius;
-    const safeValue = Math.min(value, max);
-    const strokeDashoffset = circumference - (safeValue / max) * circumference;
-
-    return (
-      <div className="progress-card">
-        <div className="progress-ring-wrapper">
-          <svg className="progress-ring" width="70" height="70">
-            <circle stroke="#e6e9e4" strokeWidth="6" fill="transparent" r={radius} cx="35" cy="35"/>
-            <circle stroke={color} strokeWidth="6" fill="transparent" r={radius} cx="35" cy="35"
-              style={{ strokeDasharray: circumference, strokeDashoffset, strokeLinecap: 'round', transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }} />
-          </svg>
-          <div className="progress-value">
-            <span className="current">{value}</span>
-            <span className="max">/ {max}{unit}</span>
-          </div>
-        </div>
-        <div className="progress-label">{label}</div>
-      </div>
-    );
-  };
 
   return (
     <div className="container home-page">
@@ -151,7 +155,6 @@ export default function Home() {
       <section 
         className={`suggestion-card suggestion-fade ${activeSuggestion}`} 
         onClick={() => navigate(activeSuggestion === 'feed' ? '/log/feed' : '/log/nappy')}
-        key={activeSuggestion}
       >
         <div className="suggestion-icon-circle">
           <span className="material-symbols-outlined material-icons-filled" style={{ 
@@ -182,9 +185,9 @@ export default function Home() {
       <section className="daily-progress">
         <h3 className="section-title">Daily Progress</h3>
         <div className="rings-container">
-          <ProgressRing value={tummyMins} max={tummyGoal} label="Tummy Time" color="#2e4e30" unit="M" />
-          <ProgressRing value={feedCount} max={feedGoal} label="Feeds" color="#494265" unit="" />
-          <ProgressRing value={diaperCount} max={nappyGoal} label="Nappies" color="#c2b280" unit="" />
+          <ProgressCard value={tummyMins} max={tummyGoal} label="Tummy Time" color="#2e4e30" unit="M" />
+          <ProgressCard value={feedCount} max={feedGoal} label="Feeds" color="#494265" unit="" />
+          <ProgressCard value={diaperCount} max={nappyGoal} label="Nappies" color="#c2b280" unit="" />
         </div>
       </section>
 

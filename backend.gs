@@ -5,12 +5,10 @@ const EVENTS_SHEET = 'Events';
 const SETTINGS_SHEET = 'Settings';
 const SPREADSHEET_ID = '1sCCtw5lMPUT_HnFE64vePRTBychSdFwwvHcJd1smB3U';
 
-// Fetch password from Script Properties (Project Settings > Script Properties)
-// Set a property named 'ACCESS_PASSWORD' with your secret key
+// Set a property named 'ACCESS_PASSWORD' in Project Settings > Script Properties
 const ACCESS_PASSWORD = PropertiesService.getScriptProperties().getProperty('ACCESS_PASSWORD');
 
 function doGet(e) {
-  // doGet is now just a health check, no sensitive data exposed
   return ContentService.createTextOutput("BabyTrack API is active.")
     .setMimeType(ContentService.MimeType.TEXT);
 }
@@ -19,122 +17,166 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     
+    // Auth Check
     if (data.password !== ACCESS_PASSWORD) {
-       return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Unauthorized' }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return createJsonResponse({ status: 'error', message: 'Unauthorized' });
     }
 
-    // Handle "Fetch" requests via POST for security
-    if (data.type === 'fetch_events' || data.type === 'fetch_settings') {
-      const sheetName = data.type === 'fetch_settings' ? SETTINGS_SHEET : EVENTS_SHEET;
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-      const sheet = ss.getSheetByName(sheetName);
-      if (!sheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
-      
-      const sheetData = sheet.getDataRange().getValues();
-      const displayData = sheet.getDataRange().getDisplayValues();
-      if (sheetData.length <= 1) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
-      
-      const headers = sheetData[0];
-      const rows = sheetData.slice(1);
-      const displayRows = displayData.slice(1);
-      const result = rows.map((row, rowIndex) => {
-        let obj = {};
-        headers.forEach((header, i) => {
-          const val = row[i];
-          const key = header.toLowerCase().replace(/\s+/g, '');
-          // Convert Date objects (from date-formatted cells) to Unix ms
-          if (val instanceof Date) {
-            const time = val.getTime();
-            if (isNaN(time)) {
-              // If it's an invalid date (caused by Google Sheets overflow), use the display string
-              obj[key] = displayRows[rowIndex][i];
-            } else {
-              obj[key] = time;
-            }
-          } else {
-            obj[key] = val;
-          }
-        });
-        return obj;
-      });
-      return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    // Handle delete
-    if (data.type === 'delete_event') {
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-      const sheet = ss.getSheetByName(EVENTS_SHEET);
-      const values = sheet.getDataRange().getValues();
-      const headers = values[0].map(h => String(h).toLowerCase().replace(/\s+/g, ''));
-      const statusIdx = headers.indexOf('status');
-      const lastUpdatedIdx = headers.indexOf('lastupdated');
-      
-      for (let i = 1; i < values.length; i++) {
-        if (String(values[i][0]) === String(data.syncId || data.id)) {
-          if (statusIdx >= 0) sheet.getRange(i + 1, statusIdx + 1).setValue('DELETED');
-          if (lastUpdatedIdx >= 0) sheet.getRange(i + 1, lastUpdatedIdx + 1).setValue(Date.now());
-          break;
-        }
-      }
-      return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-
-    const sheetName = data.type === 'settings_update' ? SETTINGS_SHEET : EVENTS_SHEET;
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sheet = ss.getSheetByName(sheetName);
-    
-    if (data.type === 'settings_update') {
-      sheet.clear();
-      sheet.appendRow(['Key', 'Value']);
-      Object.keys(data.settings).forEach(key => {
-        sheet.appendRow([key, data.settings[key]]);
-      });
-    } else {
-      // 1. Check if an entry with this syncId already exists
-      const idToFind = data.syncId || data.id;
-      let rowIndex = -1;
-      
-      if (idToFind) {
-        const values = sheet.getDataRange().getValues();
-        for (let i = 1; i < values.length; i++) {
-          if (String(values[i][0]) === String(idToFind)) {
-            rowIndex = i + 1;
-            break;
-          }
-        }
-      }
-      
-      const rowData = [
-        data.syncId || data.id || Utilities.getUuid(),
-        data.timestamp || Date.now(),
-        data.endTime || '',
-        data.type,
-        data.subtype || '',
-        data.duration || '',
-        data.notes || '',
-        data.size || '',
-        data.quantity_ml || '',
-        data.side || '',
-        data.dosage || '',
-        'ACTIVE',
-        Date.now()
-      ];
 
-      if (rowIndex > 0) {
-        // Update existing row
-        sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
-      } else {
-        // Add new row
-        sheet.appendRow(rowData);
-      }
+    switch (data.type) {
+      case 'fetch_delta':
+        return handleFetchDelta(ss, data);
+      case 'sync_operations':
+        return handleSyncOperations(ss, data);
+      case 'fetch_settings':
+      case 'settings_update':
+        return handleSettings(ss, data);
+      default:
+        return createJsonResponse({ status: 'error', message: 'Unknown type' });
+    }
+  } catch (err) {
+    return createJsonResponse({ status: 'error', message: err.message });
+  }
+}
+
+function handleFetchDelta(ss, data) {
+  const sheet = ss.getSheetByName(EVENTS_SHEET);
+  if (!sheet) return createJsonResponse([]);
+  
+  const sheetData = sheet.getDataRange().getValues();
+  const displayData = sheet.getDataRange().getDisplayValues();
+  if (sheetData.length <= 1) return createJsonResponse([]);
+  
+  const headers = sheetData[0].map(h => String(h).toLowerCase().replace(/\s+/g, ''));
+  const lastUpdatedIdx = headers.indexOf('lastupdated');
+  const timestampIdx = headers.indexOf('timestamp');
+  
+  const syncTime = Number(data.lastSyncTime) || 0;
+  const rows = sheetData.slice(1);
+  const displayRows = displayData.slice(1);
+  
+  // Important: Use a standard array for the result
+  const result = [];
+  
+  rows.forEach((row, rowIndex) => {
+    const rawLU = lastUpdatedIdx >= 0 ? row[lastUpdatedIdx] : null;
+    const displayLU = lastUpdatedIdx >= 0 ? displayRows[rowIndex][lastUpdatedIdx] : null;
+    let rowTs = parseTs(rawLU, displayLU);
+    
+    if (rowTs === 0) {
+      const rawTS = timestampIdx >= 0 ? row[timestampIdx] : null;
+      const displayTS = timestampIdx >= 0 ? displayRows[rowIndex][timestampIdx] : null;
+      rowTs = parseTs(rawTS, displayTS);
     }
     
-    return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
+    if (syncTime === 0 || rowTs > syncTime) {
+      let obj = {};
+      headers.forEach((header, i) => {
+        const val = row[i];
+        if (val instanceof Date) {
+          const time = val.getTime();
+          obj[header] = isNaN(time) ? displayRows[rowIndex][i] : time;
+        } else {
+          obj[header] = val;
+        }
+      });
+      result.push(obj);
+    }
+  });
+  
+  return createJsonResponse(result);
+}
+
+function handleSyncOperations(ss, data) {
+  const sheet = ss.getSheetByName(EVENTS_SHEET);
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0].map(h => String(h).toLowerCase().replace(/\s+/g, ''));
+  const syncIdIdx = headers.indexOf('syncid');
+  
+  const rowMap = new Map();
+  for (let i = 1; i < values.length; i++) {
+    rowMap.set(String(values[i][syncIdIdx]), i + 1);
   }
+  
+  data.operations.forEach(op => {
+    const payload = op.payload;
+    const rowIndex = rowMap.get(String(op.syncId));
+    const now = Date.now();
+    
+    const rowData = [
+      payload.syncId || op.syncId,
+      payload.timestamp || now,
+      payload.endTime || '',
+      payload.type || '',
+      payload.subtype || '',
+      payload.duration || '',
+      payload.notes || '',
+      payload.size || '',
+      payload.quantity_ml || '',
+      payload.side || '',
+      payload.dosage || '',
+      payload.status || 'ACTIVE',
+      now,
+      payload.version || 1
+    ];
+
+    if (rowIndex) {
+      sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+    } else {
+      sheet.appendRow(rowData);
+    }
+  });
+  
+  return createJsonResponse({ status: 'success' });
+}
+
+function handleSettings(ss, data) {
+  const sheet = ss.getSheetByName(SETTINGS_SHEET);
+  if (!sheet && data.type === 'fetch_settings') return createJsonResponse([]);
+
+  if (data.type === 'settings_update') {
+    if (!sheet) {
+       ss.insertSheet(SETTINGS_SHEET).appendRow(['Key', 'Value']);
+    } else {
+       sheet.clear();
+       sheet.appendRow(['Key', 'Value']);
+    }
+    const targetSheet = ss.getSheetByName(SETTINGS_SHEET);
+    Object.keys(data.settings).forEach(key => {
+      targetSheet.appendRow([key, data.settings[key]]);
+    });
+    return createJsonResponse({ status: 'success' });
+  } else {
+    const sheetData = sheet.getDataRange().getValues();
+    if (sheetData.length <= 1) return createJsonResponse([]);
+    const headers = sheetData[0];
+    const rows = sheetData.slice(1);
+    const result = rows.map(row => {
+      let obj = {};
+      headers.forEach((header, i) => {
+        obj[header.toLowerCase()] = row[i];
+      });
+      return obj;
+    });
+    return createJsonResponse(result);
+  }
+}
+
+function parseTs(v, displayV) {
+  if (v instanceof Date && !isNaN(v.getTime())) return v.getTime();
+  const clean = (val) => String(val || "").replace(/[^0-9]/g, "");
+  let n = Number(clean(v));
+  if (n > 0) return n;
+  let n2 = Number(clean(displayV));
+  if (n2 > 0) return n2;
+  let d = new Date(v).getTime();
+  if (!isNaN(d) && d > 0) return d;
+  let d2 = new Date(displayV).getTime();
+  return isNaN(d2) ? 0 : d2;
+}
+
+function createJsonResponse(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
 }

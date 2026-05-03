@@ -1,7 +1,7 @@
 import { CONFIG } from '../config';
 import { db } from '../db';
 
-export async function syncToCloud(data, isSettings = false) {
+export async function syncToCloud(isSettings = false, settingsData = null) {
   if (!CONFIG.GOOGLE_SHEETS_URL || CONFIG.GOOGLE_SHEETS_URL.includes('REPLACE_WITH_YOUR_URL')) {
     return;
   }
@@ -9,28 +9,47 @@ export async function syncToCloud(data, isSettings = false) {
   const passwordSetting = await db.settings.get('syncPassword');
   const password = passwordSetting?.value || '';
 
-  let payload;
-  if (isSettings) {
-    payload = { type: 'settings_update', settings: data, password };
-  } else {
-    payload = { 
-      ...data, 
-      password
-    };
+  if (isSettings && settingsData) {
+    const payload = { type: 'settings_update', settings: settingsData, password };
+    try {
+      await fetch(CONFIG.GOOGLE_SHEETS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      return true;
+    } catch (err) { return false; }
   }
 
+  const operations = await db.syncQueue.toArray();
+  if (operations.length === 0) return true;
+
+  const payload = {
+    type: 'sync_operations',
+    operations,
+    password
+  };
+
   try {
-    await fetch(CONFIG.GOOGLE_SHEETS_URL, {
+    const res = await fetch(CONFIG.GOOGLE_SHEETS_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    
-    await db.settings.put({ key: 'lastSync', value: new Date().toISOString() });
-    return true;
+
+    // We expect JSON back from sync_operations
+    const text = await res.text();
+    let result;
+    try { result = JSON.parse(text); } catch (e) { result = { status: 'success' }; }
+
+    if (result.status !== 'error') {
+      const ids = operations.map(op => op.id);
+      await db.syncQueue.bulkDelete(ids);
+      await db.settings.put({ key: 'lastSync', value: new Date().toISOString() });
+      return true;
+    }
+    return false;
   } catch (error) {
     console.error('Sync failed:', error);
     return false;
@@ -46,71 +65,74 @@ export async function fetchFromCloud() {
   const password = passwordSetting?.value || '';
 
   try {
-    // 1. Fetch Events using POST for security
+    // 1. Fetch Events using POST
+    const lastSyncSetting = await db.settings.get('lastFetchTime');
+    const lastSyncTime = lastSyncSetting?.value ? new Date(lastSyncSetting.value).getTime() : 0;
+
     const eventsResponse = await fetch(CONFIG.GOOGLE_SHEETS_URL, {
       method: 'POST',
-      body: JSON.stringify({ type: 'fetch_events', password })
+      body: JSON.stringify({ type: 'fetch_delta', lastSyncTime, password })
     });
-    // For POST we need to follow the redirect if not using no-cors. 
-    // Actually, GAS redirects from POST to a GET, but we can just use the response if handled correctly.
-    // However, GAS 'doPost' returns the content directly if we use ContentService.
     const remoteEvents = await eventsResponse.json();
-    
+    console.log({ remoteEvents });
     if (remoteEvents.status === 'error') throw new Error(remoteEvents.message);
-    
+
     if (Array.isArray(remoteEvents) && remoteEvents.length > 0) {
+      console.log('Remote data received, items:', remoteEvents.length);
       const existingEvents = await db.events.toArray();
       const existingMap = new Map(existingEvents.map(e => [e.syncId, e]));
 
-      const deletedIds = remoteEvents
-        .filter(e => e.status && String(e.status).toUpperCase() === 'DELETED')
-        .map(e => String(e.syncid || e.id));
-
       const formattedEvents = remoteEvents
-        .filter(e => (e.syncid || e.id) && (!e.status || String(e.status).toUpperCase() !== 'DELETED'))
         .map(e => {
-          const syncId = e.syncid || String(e.id);
-          const existing = existingMap.get(syncId);
-          
-          let ts = existing?.timestamp || Date.now();
-          if (e.timestamp) {
-            let parsedTs = Number(e.timestamp);
-            if (isNaN(parsedTs)) parsedTs = new Date(e.timestamp).getTime();
-            if (!isNaN(parsedTs)) ts = parsedTs;
+          // Robustly find syncId and type regardless of casing
+          const findKey = (obj, key) => {
+            const lowerKey = key.toLowerCase();
+            const realKey = Object.keys(obj).find(k => k.toLowerCase() === lowerKey);
+            return realKey ? obj[realKey] : undefined;
+          };
+
+          const rawSyncId = findKey(e, 'syncid') || findKey(e, 'id');
+          const syncId = String(rawSyncId || '');
+          if (!syncId) return null;
+
+          const status = String(findKey(e, 'status') || 'ACTIVE').toUpperCase();
+          if (status === 'DELETED') {
+            return { syncId, status: 'DELETED', _deleteMe: true };
           }
-          
-          let et = existing?.endTime || undefined;
-          if (e.endtime) {
-            let parsedEt = Number(e.endtime);
-            if (isNaN(parsedEt)) parsedEt = new Date(e.endtime).getTime();
-            if (!isNaN(parsedEt)) et = parsedEt;
-          }
+
+          const type = String(findKey(e, 'type') || '').toLowerCase();
+          const timestamp = Number(findKey(e, 'lastupdated') || findKey(e, 'timestamp'));
+          const endTime = Number(findKey(e, 'endtime'));
 
           return {
             syncId,
-            type: e.type,
-            subtype: e.subtype || undefined,
-            timestamp: ts,
-            endTime: et,
-            duration: e.duration || undefined,
-            notes: e.notes || undefined,
-            size: e.size || undefined,
-            quantity_ml: e.quantity ? parseInt(e.quantity) : undefined,
-            side: e.side || undefined,
-            dosage: e.dosage || undefined,
+            type,
+            subtype: findKey(e, 'subtype') || undefined,
+            timestamp: !isNaN(timestamp) && timestamp > 0 ? timestamp : Date.now(),
+            endTime: !isNaN(endTime) && endTime > 0 ? endTime : undefined,
+            duration: findKey(e, 'duration') || undefined,
+            notes: findKey(e, 'notes') || undefined,
+            size: findKey(e, 'size') || undefined,
+            quantity_ml: parseInt(findKey(e, 'quantity_ml') || findKey(e, 'quantity')) || undefined,
+            side: findKey(e, 'side') || undefined,
+            dosage: findKey(e, 'dosage') || undefined,
+            status: 'ACTIVE',
+            version: Number(findKey(e, 'version')) || 1,
             synced: true,
           };
-        });
-      try {
-        if (deletedIds.length > 0) {
-          await db.events.bulkDelete(deletedIds);
-        }
-        if (formattedEvents.length > 0) {
-          await db.events.bulkPut(formattedEvents);
-        }
-      } catch (err) {
-        console.error('sync operations failed:', err);
+        })
+        .filter(e => e !== null);
+
+      const toDelete = formattedEvents.filter(e => e._deleteMe).map(e => e.syncId);
+      const toPut = formattedEvents.filter(e => !e._deleteMe);
+
+      if (toDelete.length > 0) await db.events.bulkDelete(toDelete);
+      if (toPut.length > 0) {
+        console.log(`Putting ${toPut.length} items into local DB`);
+        await db.events.bulkPut(toPut);
       }
+    } else {
+      console.log('No new data received from cloud.');
     }
 
     // 2. Fetch Settings using POST for security
@@ -119,41 +141,25 @@ export async function fetchFromCloud() {
       body: JSON.stringify({ type: 'fetch_settings', password })
     });
     const remoteSettings = await settingsResponse.json();
-    
+
     if (remoteSettings.status === 'error') throw new Error(remoteSettings.message);
-    
+
     if (Array.isArray(remoteSettings) && remoteSettings.length > 0) {
       for (const item of remoteSettings) {
         let val = item.value;
-        if (!isNaN(val) && val !== '') val = Number(val);
-        await db.settings.put({ key: item.key, value: val });
+        if (val !== null && val !== undefined && !isNaN(val) && val !== '') {
+          val = Number(val);
+        }
+        if (item.key) {
+          await db.settings.put({ key: item.key, value: val });
+        }
       }
     }
 
-    await db.settings.put({ key: 'lastSync', value: new Date().toISOString() });
+    await db.settings.put({ key: 'lastFetchTime', value: new Date().toISOString() });
     return true;
   } catch (error) {
     console.error('Fetch from cloud failed:', error);
     return false;
-  }
-}
-
-export async function deleteFromCloud(id) {
-  if (!CONFIG.GOOGLE_SHEETS_URL || CONFIG.GOOGLE_SHEETS_URL.includes('REPLACE_WITH_YOUR_URL')) {
-    return;
-  }
-
-  const passwordSetting = await db.settings.get('syncPassword');
-  const password = passwordSetting?.value || '';
-
-  try {
-    await fetch(CONFIG.GOOGLE_SHEETS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'delete_event', id, password }),
-    });
-  } catch (error) {
-    console.error('Delete sync failed:', error);
   }
 }

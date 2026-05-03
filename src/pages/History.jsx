@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useEvents, deleteEvent } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
 import { formatTime, formatTimeRange } from '../utils/timeFormat';
@@ -29,13 +29,16 @@ export default function History() {
     return `Are you sure you want to delete the ${event.type} log from ${time}${details}? This action cannot be undone.`;
   };
 
-  // Group events by date
-  const groupedEvents = events?.reduce((acc, event) => {
-    const date = new Date(event.timestamp).toLocaleDateString();
-    if (!acc[date]) acc[date] = [];
-    acc[date].push(event);
-    return acc;
-  }, {});
+  // Group events by date using useMemo
+  const groupedEvents = useMemo(() => {
+    if (!events) return {};
+    return events.reduce((acc, event) => {
+      const date = event.timestamp ? new Date(event.timestamp).toLocaleDateString() : 'Unknown Date';
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(event);
+      return acc;
+    }, {});
+  }, [events]);
 
   return (
     <div className="container history-page">
