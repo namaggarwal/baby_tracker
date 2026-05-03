@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
+import { syncToCloud } from '../utils/sync';
 
 export function useEvents(type = null) {
   return useLiveQuery(
@@ -14,15 +15,24 @@ export function useEvents(type = null) {
 }
 
 export async function addEvent(eventData) {
-  return await db.events.add({
+  const fullEvent = {
     ...eventData,
     timestamp: eventData.timestamp || new Date().toISOString(),
     synced: false
-  });
+  };
+  const id = await db.events.add(fullEvent);
+  
+  // Background sync
+  syncToCloud({ ...fullEvent, id });
+  
+  return id;
 }
 
 export async function updateEvent(id, changes) {
-  return await db.events.update(id, { ...changes, synced: false });
+  await db.events.update(id, { ...changes, synced: false });
+  const updated = await db.events.get(id);
+  syncToCloud(updated);
+  return id;
 }
 
 export async function deleteEvent(id) {

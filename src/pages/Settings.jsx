@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useSettings } from '../hooks/useSettings';
 import { clearAllEvents } from '../hooks/useEvents';
+import { fetchFromCloud } from '../utils/sync';
+import { useToast } from '../context/ToastContext';
 import './Settings.css';
 
 export default function Settings() {
   const { settings, updateSetting, resetSettings } = useSettings();
+  const { showToast } = useToast();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(settings?.babyName || '');
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const handleDeleteAllData = async () => {
     await clearAllEvents();
@@ -18,6 +22,18 @@ export default function Settings() {
   const handleSaveName = async () => {
     await updateSetting('babyName', tempName);
     setIsEditingName(false);
+  };
+
+  const handleSyncNow = async () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    const success = await fetchFromCloud();
+    setIsSyncing(false);
+    if (success) {
+      showToast('Data synced from cloud!');
+    } else {
+      showToast('Sync failed. Check connection.', 'error');
+    }
   };
 
   return (
@@ -199,9 +215,61 @@ export default function Settings() {
       <section className="settings-section">
         <h3>Data & Sync</h3>
         <div className="setting-item">
-          <label>Google Sheets Sync</label>
-          <p className="setting-description">Connect to Google Sheets to back up your data.</p>
-          <button className="btn-secondary" disabled style={{ opacity: 0.5 }}>Connect (Coming Soon)</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <label>Google Sheets Backup</label>
+              <p className="setting-description">Automatic cloud backup enabled.</p>
+              <p style={{ marginTop: '8px', fontSize: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <strong>Last Sync:</strong> {settings?.lastSync ? new Date(settings.lastSync).toLocaleString() : 'Never'}
+              </p>
+            </div>
+            <button 
+              className="btn-secondary" 
+              onClick={handleSyncNow}
+              disabled={isSyncing}
+              style={{ padding: '8px 16px', borderRadius: '20px', fontSize: '13px', opacity: isSyncing ? 0.7 : 1 }}
+            >
+              {isSyncing ? 'Syncing...' : 'Sync Now'}
+            </button>
+          </div>
+
+          <div style={{ marginTop: '20px' }}>
+            <label style={{ fontSize: '13px', fontWeight: '600' }}>Sync Password / API Key</label>
+            <input 
+              type="password" 
+              placeholder="Enter security key"
+              value={settings?.syncPassword || ''} 
+              onChange={(e) => updateSetting('syncPassword', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '12px',
+                border: '1px solid var(--color-surface-dim)',
+                background: 'var(--color-surface-container)',
+                marginTop: '8px',
+                fontSize: '14px',
+                outline: 'none'
+              }}
+            />
+            <p className="setting-description" style={{ marginTop: '4px', fontSize: '11px' }}>
+              Must match the password set in your Google Apps Script.
+            </p>
+          </div>
+          <div className="status-badge" style={{ 
+            marginTop: '16px', 
+            padding: '8px 12px', 
+            borderRadius: '8px', 
+            background: 'var(--color-surface-container)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '12px',
+            fontWeight: '600',
+            color: 'var(--color-primary)'
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>check_circle</span>
+            System connected and healthy
+          </div>
         </div>
       </section>
 
