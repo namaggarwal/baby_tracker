@@ -66,7 +66,10 @@ export async function fetchFromCloud() {
   try {
     // 1. Fetch Events using POST
     const lastSyncSetting = await db.settings.get('lastFetchTime');
-    const lastSyncTime = lastSyncSetting?.value ? new Date(lastSyncSetting.value).getTime() : 0;
+    // Subtract 1 minute (60,000ms) as a safety buffer to ensure no overlapping updates are missed
+    const lastSyncTime = lastSyncSetting?.value
+      ? Math.max(0, new Date(lastSyncSetting.value).getTime() - 60000)
+      : 0;
 
     const eventsResponse = await fetch(CONFIG.GOOGLE_SHEETS_URL, {
       method: 'POST',
@@ -100,7 +103,7 @@ export async function fetchFromCloud() {
           }
 
           const type = String(findKey(e, 'type') || '').toLowerCase();
-          
+
           // Prioritize original event timestamp over sync time (lastupdated)
           let ts = Number(findKey(e, 'timestamp'));
           if (isNaN(ts) || ts <= 0) {
