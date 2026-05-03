@@ -10,6 +10,7 @@ export default function History() {
   const events = useEvents();
   const { settings } = useSettings();
   const [deleteEventObj, setDeleteEventObj] = useState(null);
+  const [daysToShow, setDaysToShow] = useState(7);
 
   const handleConfirmDelete = async () => {
     if (deleteEventObj) {
@@ -29,16 +30,31 @@ export default function History() {
     return `Are you sure you want to delete the ${event.type} log from ${time}${details}? This action cannot be undone.`;
   };
 
+  // Filter events based on the pagination window
+  const visibleEvents = useMemo(() => {
+    if (!events) return [];
+    const cutoff = new Date();
+    cutoff.setHours(0, 0, 0, 0);
+    cutoff.setDate(cutoff.getDate() - daysToShow);
+    return events.filter(e => e.timestamp && new Date(e.timestamp) >= cutoff);
+  }, [events, daysToShow]);
+
   // Group events by date using useMemo
   const groupedEvents = useMemo(() => {
-    if (!events) return {};
-    return events.reduce((acc, event) => {
+    return visibleEvents.reduce((acc, event) => {
       const date = event.timestamp ? new Date(event.timestamp).toLocaleDateString() : 'Unknown Date';
       if (!acc[date]) acc[date] = [];
       acc[date].push(event);
       return acc;
     }, {});
-  }, [events]);
+  }, [visibleEvents]);
+
+  const hasMore = useMemo(() => {
+    if (!events || visibleEvents.length === 0) return false;
+    const oldestVisible = Math.min(...visibleEvents.map(e => e.timestamp));
+    const oldestInDb = Math.min(...events.filter(e => e.timestamp).map(e => e.timestamp));
+    return oldestInDb < oldestVisible;
+  }, [events, visibleEvents]);
 
   return (
     <div className="container history-page">
@@ -130,6 +146,15 @@ export default function History() {
             </div>
             <h3>No activities yet</h3>
             <p>Your baby's journey starts here. Log your first activity to see it in the timeline.</p>
+          </div>
+        )}
+
+        {hasMore && (
+          <div className="load-more-container">
+            <button className="load-more-btn" onClick={() => setDaysToShow(prev => prev + 7)}>
+              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>expand_more</span>
+              Load More History
+            </button>
           </div>
         )}
       </div>

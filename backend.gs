@@ -115,13 +115,14 @@ function handleSyncOperations(ss, data) {
       // 1. Always update LastUpdated
       if (header === 'lastupdated') return now;
       
-      // 2. Identify the field in the payload (if present)
-      if (payload.hasOwnProperty(header)) return payload[header];
+      // 2. Identify the field in the payload (case-insensitive)
+      const payloadKey = Object.keys(payload).find(k => k.toLowerCase() === header);
+      if (payloadKey !== undefined) return payload[payloadKey];
       
       // Special mapping for quantity vs quantity_ml
       if (header === 'quantity' || header === 'quantity_ml') {
-        if (payload.hasOwnProperty('quantity_ml')) return payload.quantity_ml;
-        if (payload.hasOwnProperty('quantity')) return payload.quantity;
+        const qKey = Object.keys(payload).find(k => k.toLowerCase() === 'quantity' || k.toLowerCase() === 'quantity_ml');
+        if (qKey) return payload[qKey];
       }
 
       // 3. For existing rows, preserve EVERYTHING ELSE exactly as is
