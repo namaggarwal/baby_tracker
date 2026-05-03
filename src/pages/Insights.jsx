@@ -4,7 +4,7 @@ import './Insights.css';
 
 export default function Insights() {
   const events = useEvents();
-  const [viewMode, setViewMode] = useState('weekly'); // 'daily' or 'weekly'
+  const [viewMode, setViewMode] = useState('daily'); // 'daily' or 'weekly'
 
   const stats = useMemo(() => {
     if (!events) return null;
