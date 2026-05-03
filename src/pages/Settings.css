@@ -308,3 +308,33 @@
   color: var(--color-primary);
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
+
+.toggle-switch {
+  width: 52px;
+  height: 32px;
+  background: var(--color-surface-dim);
+  border-radius: 16px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-switch.active {
+  background: var(--color-primary);
+}
+
+.toggle-knob {
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-switch.active .toggle-knob {
+  left: 24px;
+}

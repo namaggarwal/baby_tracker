@@ -1,9 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useEvents } from '../hooks/useEvents';
+import { useSettings } from '../hooks/useSettings';
+import { formatTime } from '../utils/timeFormat';
 import './Insights.css';
 
 export default function Insights() {
   const events = useEvents();
+  const { settings } = useSettings();
   const [viewMode, setViewMode] = useState('daily'); // 'daily' or 'weekly'
 
   const stats = useMemo(() => {
@@ -61,8 +64,8 @@ export default function Insights() {
         },
         sleepSessions: dayEvents.filter(e => e.type === 'sleep').map(e => ({
           id: e.syncId,
-          startTime: new Date(e.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          endTime: e.endTime ? new Date(e.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Ongoing',
+          startTime: formatTime(e.timestamp, settings?.timeFormat),
+          endTime: e.endTime ? formatTime(e.endTime, settings?.timeFormat) : 'Ongoing',
           duration: e.duration || '...'
         }))
       });
@@ -266,7 +269,7 @@ export default function Insights() {
                 <h3>Bath Routine</h3>
                 <p className="card-subtitle">
                   {stats.averages.lastBath 
-                    ? `Last bath: ${new Date(stats.averages.lastBath).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                    ? `Last bath: ${new Date(stats.averages.lastBath).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })} at ${formatTime(stats.averages.lastBath, settings?.timeFormat)}`
                     : 'No bath recorded yet'}
                 </p>
               </div>

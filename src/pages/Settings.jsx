@@ -159,6 +159,31 @@ export default function Settings() {
           </div>
           <p className="setting-description">Recommend next change after this interval.</p>
         </div>
+
+        <div className="setting-item">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <label>Push Notifications</label>
+              <p className="setting-description">Get reminded when it's time for a feed or change.</p>
+            </div>
+            <div 
+              className={`toggle-switch ${settings?.notificationsEnabled ? 'active' : ''}`}
+              onClick={async () => {
+                const newValue = !settings?.notificationsEnabled;
+                if (newValue) {
+                  const permission = await Notification.requestPermission();
+                  if (permission !== 'granted') {
+                    showToast('Notification permission denied', 'error');
+                    return;
+                  }
+                }
+                updateSetting('notificationsEnabled', newValue);
+              }}
+            >
+              <div className="toggle-knob"></div>
+            </div>
+          </div>
+        </div>
       </section>
       
       <section className="settings-section">
