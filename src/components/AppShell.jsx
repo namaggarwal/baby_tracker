@@ -1,8 +1,11 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import QuickAddMenu from './QuickAddMenu';
 import { useToast } from '../context/ToastContext';
+import { fetchFromCloud } from '../utils/sync';
 import './AppShell.css';
+
+const POLL_INTERVAL_MS = 30000; // 30 seconds
 
 export default function AppShell() {
   const location = useLocation();
@@ -10,10 +13,36 @@ export default function AppShell() {
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const { showToast } = useToast();
 
+  const autoSync = useCallback(async (silent = true) => {
+    if (!navigator.onLine) return;
+    const success = await fetchFromCloud();
+    if (!silent && success) {
+      showToast('Synced latest updates!', 'success');
+    }
+  }, [showToast]);
+
+  // Poll every 30 seconds when online
+  useEffect(() => {
+    const interval = setInterval(() => autoSync(true), POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [autoSync]);
+
+  // Sync immediately when the user brings the app back into focus (picks up phone)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        autoSync(false);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [autoSync]);
+
   useEffect(() => {
     const handleOnline = () => {
       setIsOffline(false);
       showToast('Back online! All set.', 'success');
+      autoSync(true); // Sync immediately on reconnect
     };
     const handleOffline = () => {
       setIsOffline(true);
@@ -26,7 +55,7 @@ export default function AppShell() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [showToast]);
+  }, [showToast, autoSync]);
 
   return (
     <div className="app-container">
