@@ -13,7 +13,7 @@ export default function History() {
 
   const handleConfirmDelete = async () => {
     if (deleteEventObj) {
-      await deleteEvent(deleteEventObj.id);
+      await deleteEvent(deleteEventObj.syncId);
       setDeleteEventObj(null);
     }
   };
@@ -49,7 +49,7 @@ export default function History() {
             <h3 className="date-header">{date}</h3>
             <div className="day-events">
               {groupedEvents[date].map(event => (
-                <div key={event.id} className="timeline-item">
+                <div key={event.syncId} className="timeline-item">
                   <div className="timeline-time">
                     {formatTime(event.timestamp, settings?.timeFormat)}
                   </div>

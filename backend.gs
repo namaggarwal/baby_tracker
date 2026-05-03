@@ -66,9 +66,14 @@ function doPost(e) {
       const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
       const sheet = ss.getSheetByName(EVENTS_SHEET);
       const values = sheet.getDataRange().getValues();
+      const headers = values[0].map(h => String(h).toLowerCase().replace(/\s+/g, ''));
+      const statusIdx = headers.indexOf('status');
+      const lastUpdatedIdx = headers.indexOf('lastupdated');
+      
       for (let i = 1; i < values.length; i++) {
         if (String(values[i][0]) === String(data.syncId || data.id)) {
-          sheet.deleteRow(i + 1);
+          if (statusIdx >= 0) sheet.getRange(i + 1, statusIdx + 1).setValue('DELETED');
+          if (lastUpdatedIdx >= 0) sheet.getRange(i + 1, lastUpdatedIdx + 1).setValue(Date.now());
           break;
         }
       }
@@ -112,7 +117,9 @@ function doPost(e) {
         data.size || '',
         data.quantity_ml || '',
         data.side || '',
-        data.dosage || ''
+        data.dosage || '',
+        'ACTIVE',
+        Date.now()
       ];
 
       if (rowIndex > 0) {

@@ -60,7 +60,7 @@ export default function Insights() {
           mixed: dayEvents.filter(e => e.type === 'diaper' && e.subtype === 'mixed').length,
         },
         sleepSessions: dayEvents.filter(e => e.type === 'sleep').map(e => ({
-          id: e.id,
+          id: e.syncId,
           startTime: new Date(e.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           endTime: e.endTime ? new Date(e.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Ongoing',
           duration: e.duration || '...'

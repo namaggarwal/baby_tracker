@@ -15,9 +15,7 @@ export async function syncToCloud(data, isSettings = false) {
   } else {
     payload = { 
       ...data, 
-      password,
-      timestamp: data.timestamp ? new Date(data.timestamp).toISOString() : '',
-      endTime: data.endTime ? new Date(data.endTime).toISOString() : ''
+      password
     };
   }
 
@@ -64,8 +62,12 @@ export async function fetchFromCloud() {
       const existingEvents = await db.events.toArray();
       const existingMap = new Map(existingEvents.map(e => [e.syncId, e]));
 
+      const deletedIds = remoteEvents
+        .filter(e => e.status && String(e.status).toUpperCase() === 'DELETED')
+        .map(e => String(e.syncid || e.id));
+
       const formattedEvents = remoteEvents
-        .filter(e => e.syncid || e.id)
+        .filter(e => (e.syncid || e.id) && (!e.status || String(e.status).toUpperCase() !== 'DELETED'))
         .map(e => {
           const syncId = e.syncid || String(e.id);
           const existing = existingMap.get(syncId);
@@ -100,9 +102,14 @@ export async function fetchFromCloud() {
           };
         });
       try {
-        await db.events.bulkPut(formattedEvents);
+        if (deletedIds.length > 0) {
+          await db.events.bulkDelete(deletedIds);
+        }
+        if (formattedEvents.length > 0) {
+          await db.events.bulkPut(formattedEvents);
+        }
       } catch (err) {
-        console.error('bulkPut events failed:', err);
+        console.error('sync operations failed:', err);
       }
     }
 

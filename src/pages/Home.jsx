@@ -196,7 +196,7 @@ export default function Home() {
         </div>
         <div className="activity-list">
           {events && events.length > 0 ? events.slice(0, 3).map(event => (
-            <div key={event.id} className="activity-item">
+            <div key={event.syncId} className="activity-item">
                <div className="activity-icon-container">
                  {event.type === 'feed' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#436444' }}>nutrition</span>}
                  {event.type === 'sleep' && <span className="material-symbols-outlined material-icons-filled" style={{ fontSize: '24px', color: '#61597e' }}>bedtime</span>}
