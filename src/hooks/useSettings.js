@@ -25,7 +25,11 @@ export function useSettings() {
       syncToCloud(allSettings, true);
     },
     resetSettings: async () => {
+      // Capture the password to preserve it
+      const password = await db.settings.get('syncPassword');
       await db.settings.clear();
+      // Restore the password if it existed
+      if (password) await db.settings.put(password);
     }
   };
 }
