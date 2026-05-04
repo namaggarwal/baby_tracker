@@ -46,6 +46,9 @@
   padding: 24px;
   margin-bottom: 24px;
   transition: background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .status-card.is-sleeping {
@@ -56,11 +59,18 @@
   background: #f1f4f0; /* Light sage */
 }
 
-.status-top {
+.status-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+}
+
+.status-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 4px;
 }
 
 .status-main {
@@ -100,9 +110,12 @@
   padding: 8px 16px;
   border-radius: 24px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: #494265;
-  font-family: inherit;
+  font-family: 'Courier New', Courier, monospace;
+  font-variant-numeric: tabular-nums;
+  min-width: 90px;
+  text-align: center;
   letter-spacing: 0.5px;
 }
 

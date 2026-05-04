@@ -267,7 +267,7 @@ export default function Home() {
 
       {/* Current Status Card */}
       <section className={`status-card ${isSleeping ? 'is-sleeping' : 'is-awake'}`}>
-        <div className="status-top">
+        <div className="status-header-row">
           <div className="status-main">
             <div className="status-icon">
               <span className="material-symbols-outlined material-icons-filled" style={{ 
@@ -282,19 +282,21 @@ export default function Home() {
               <span className="status-title">{babyName} is {isSleeping ? 'sleeping' : 'awake'}</span>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
-            <div className="status-timer">{elapsedTime}</div>
-            <button 
-              className={`quick-action-btn ${isSleeping ? 'wake' : 'sleep'}`}
-              onClick={handleQuickSleepToggle}
-            >
-              <span className="material-symbols-outlined">
-                {isSleeping ? 'sunny' : 'bedtime'}
-              </span>
-              {isSleeping ? 'End Nap' : 'Start Nap'}
-            </button>
-          </div>
         </div>
+
+        <div className="status-controls-row">
+          <div className="status-timer">{elapsedTime}</div>
+          <button 
+            className={`quick-action-btn ${isSleeping ? 'wake' : 'sleep'}`}
+            onClick={handleQuickSleepToggle}
+          >
+            <span className="material-symbols-outlined">
+              {isSleeping ? 'sunny' : 'bedtime'}
+            </span>
+            {isSleeping ? 'End Nap' : 'Start Nap'}
+          </button>
+        </div>
+
         <div className="status-footer">
           <span className="material-symbols-outlined" style={{ 
             fontSize: '16px', 
