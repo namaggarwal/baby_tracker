@@ -40,7 +40,44 @@ export default function Home() {
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
   const [activeSuggestion, setActiveSuggestion] = useState('feed');
   const [isSyncing, setIsSyncing] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const { showToast } = useToast();
+  const { updateSetting } = useSettings();
+
+  const overdueAlerts = useMemo(() => {
+    if (!events || !settings) return [];
+    const now = Date.now();
+    const alerts = [];
+
+    const lastFeed = events.find(e => e.type === 'feed');
+    if (lastFeed) {
+      const intervalMs = (parseFloat(settings.feedingInterval) || 3) * 60 * 60 * 1000;
+      if (now - lastFeed.timestamp >= intervalMs) {
+        alerts.push({
+          type: 'feed',
+          title: 'Feeding Due',
+          message: `${Math.floor((now - lastFeed.timestamp) / 3600000)}h since last feed`,
+          link: '/log/feed',
+          icon: 'nutrition'
+        });
+      }
+    }
+
+    const lastDiaper = events.find(e => e.type === 'diaper');
+    if (lastDiaper) {
+      const intervalMs = (parseFloat(settings.nappyInterval) || 3) * 60 * 60 * 1000;
+      if (now - lastDiaper.timestamp >= intervalMs) {
+        alerts.push({
+          type: 'diaper',
+          title: 'Nappy Change Due',
+          message: `${Math.floor((now - lastDiaper.timestamp) / 3600000)}h since last change`,
+          link: '/log/nappy',
+          icon: 'water_drop'
+        });
+      }
+    }
+    return alerts;
+  }, [events, settings]);
 
   const handleSyncNow = async () => {
     if (isSyncing) return;
@@ -161,10 +198,45 @@ export default function Home() {
           <img src={settings?.profileImage || "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=100&q=80"} alt="Baby" className="avatar" onError={(e) => { e.target.onerror = null; e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="%23d8dbd6"/></svg>' }} />
           <h2>{babyName}'s Day</h2>
         </div>
-        <button className="icon-btn">
-          <span className="material-symbols-outlined" style={{ fontSize: '24px', color: '#012108' }}>notifications</span>
-        </button>
+        <div className="header-actions">
+          <button className="icon-btn notification-bell" onClick={() => setShowNotifications(!showNotifications)}>
+            <span className="material-symbols-outlined" style={{ fontSize: '24px', color: '#012108' }}>notifications</span>
+            {overdueAlerts.length > 0 && <span className="notification-badge"></span>}
+          </button>
+        </div>
       </header>
+
+      {showNotifications && (
+        <div className="notification-overlay" onClick={() => setShowNotifications(false)}>
+          <div className="notification-panel" onClick={e => e.stopPropagation()}>
+            <div className="panel-header">
+              <h3>Reminders</h3>
+              <button className="close-btn" onClick={() => setShowNotifications(false)}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="alert-list">
+              {overdueAlerts.length > 0 ? overdueAlerts.map((alert, i) => (
+                <div key={i} className="alert-item" onClick={() => navigate(alert.link)}>
+                  <div className={`alert-icon-box ${alert.type}`}>
+                    <span className="material-symbols-outlined material-icons-filled">{alert.icon}</span>
+                  </div>
+                  <div className="alert-content">
+                    <span className="alert-title">{alert.title}</span>
+                    <span className="alert-msg">{alert.message}</span>
+                  </div>
+                  <span className="material-symbols-outlined alert-chevron">chevron_right</span>
+                </div>
+              )) : (
+                <div className="empty-alerts">
+                  <span className="material-symbols-outlined">done_all</span>
+                  <p>All caught up! No reminders right now.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Current Status Card */}
       <section className={`status-card ${isSleeping ? 'is-sleeping' : 'is-awake'}`}>
