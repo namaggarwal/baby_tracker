@@ -10,20 +10,20 @@
   * **File:** `backend.gs` (now `Code.gs`)
   * **Issue:** FIXED. The logic now handles raw numbers, ISO strings, and formatted strings (commas) robustly.
 
-- [ ] **3. Settings Sync is "Fire and Forget" (Frontend)**
+- [x] **3. Settings Sync is "Fire and Forget" (Frontend)**
   * **File:** `src/hooks/useSettings.js`
-  * **Issue:** Settings updates bypass the `syncQueue` and attempt an immediate `fetch`. If the user is offline, the settings are saved locally but dropped from the network, causing permanent desynchronization between devices.
+  * **Issue:** FIXED. Settings updates are now added to the `syncQueue` and the backend handles them row-by-row with delta sync support.
 
 ### 🟡 Moderate Race Conditions & Edge Cases
 
-- [ ] **4. Concurrent Sync Race Condition (Frontend)**
-  * **File:** `src/hooks/useEvents.js` / `src/utils/sync.js`
-  * **Issue:** Rapidly firing `addEvent` or `updateEvent` triggers multiple parallel `syncToCloud()` calls. They can concurrently read the exact same `syncQueue` operations and send duplicates to the backend.
-
-- [ ] **5. Local Overwrite Glitch during "Sync Now" (Frontend)**
-  * **File:** `src/utils/sync.js` (`fetchFromCloud`)
-  * **Issue:** Running a manual fetch pulls remote data and immediately overwrites local data. If there are pending local operations in the `syncQueue` that haven't been uploaded yet, the UI will temporarily revert to the older server state.
-
-- [ ] **6. Inconsistent `lastSync` Data Type (Frontend)**
+- [x] **4. Concurrent Sync Race Condition (Frontend)**
   * **File:** `src/utils/sync.js`
-  * **Issue:** `fetchFromCloud` saves timestamps as `Date.now()` (number), but `syncToCloud` still uses `new Date().toISOString()` (string). This creates a type mismatch in the IndexedDB `settings` table.
+  * **Issue:** FIXED. Added an `isSyncing` lock to prevent multiple parallel sync/fetch calls.
+
+- [x] **5. Local Overwrite Glitch during "Sync Now" (Frontend)**
+  * **File:** `src/utils/sync.js`
+  * **Issue:** FIXED. Fetch logic now checks the `syncQueue` and skips updating any event that has a pending local edit, protecting un-synced data.
+
+- [x] **6. Inconsistent `lastSync` Data Type (Frontend)**
+  * **File:** `src/utils/sync.js`
+  * **Issue:** FIXED. Unified all sync timestamps to use `Date.now()` (number) for consistency.

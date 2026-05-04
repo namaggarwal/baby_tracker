@@ -324,6 +324,11 @@ export default function Settings() {
           </div>
         </div>
       )}
+
+      <footer className="settings-footer">
+        <p>BabyTrack Premium Version 1.0.0</p>
+        <p>Build: {__BUILD_DATE__}</p>
+      </footer>
     </div>
   );
 }

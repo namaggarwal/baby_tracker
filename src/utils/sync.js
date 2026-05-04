@@ -1,30 +1,37 @@
 import { CONFIG } from '../config';
 import { db } from '../db';
 
+let isSyncing = false;
+
 export async function syncToCloud() {
+  if (isSyncing) {
+    console.log('Sync already in progress, skipping...');
+    return;
+  }
+
   if (!CONFIG.GOOGLE_SHEETS_URL || CONFIG.GOOGLE_SHEETS_URL.includes('REPLACE_WITH_YOUR_URL')) {
     return;
   }
 
-  const passwordSetting = await db.settings.get('syncPassword');
-  const password = passwordSetting?.value || '';
-
-  const operations = await db.syncQueue.toArray();
-  if (operations.length === 0) return true;
-
-  const payload = {
-    type: 'sync_operations',
-    operations,
-    password
-  };
-
+  isSyncing = true;
   try {
+    const passwordSetting = await db.settings.get('syncPassword');
+    const password = passwordSetting?.value || '';
+
+    const operations = await db.syncQueue.toArray();
+    if (operations.length === 0) return true;
+
+    const payload = {
+      type: 'sync_operations',
+      operations,
+      password
+    };
+
     const res = await fetch(CONFIG.GOOGLE_SHEETS_URL, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
 
-    // We expect JSON back from sync_operations
     const text = await res.text();
     let result;
     try { result = JSON.parse(text); } catch (e) { result = { status: 'success' }; }
@@ -33,7 +40,7 @@ export async function syncToCloud() {
       console.log('Sync operations successful');
       const ids = operations.map(op => op.id);
       await db.syncQueue.bulkDelete(ids);
-      await db.settings.put({ key: 'lastSync', value: new Date().toISOString() });
+      await db.settings.put({ key: 'lastSync', value: Date.now() });
       return true;
     }
     console.warn('Sync operations failed on server:', result.message);
@@ -41,21 +48,28 @@ export async function syncToCloud() {
   } catch (error) {
     console.error('Sync failed:', error);
     return false;
+  } finally {
+    isSyncing = false;
   }
 }
 
 export async function fetchFromCloud() {
+  if (isSyncing) {
+    console.log('Sync/Fetch already in progress, skipping...');
+    return null;
+  }
+
   if (!CONFIG.GOOGLE_SHEETS_URL || CONFIG.GOOGLE_SHEETS_URL.includes('REPLACE_WITH_YOUR_URL')) {
     return null;
   }
 
-  const passwordSetting = await db.settings.get('syncPassword');
-  const password = passwordSetting?.value || '';
-
+  isSyncing = true;
   try {
+    const passwordSetting = await db.settings.get('syncPassword');
+    const password = passwordSetting?.value || '';
+
     // 1. Fetch Events using POST
     const lastSyncSetting = await db.settings.get('lastFetchTime');
-    // Subtract 5 minutes (300000ms) as a safety buffer to ensure no overlapping updates are missed
     const lastSyncTime = lastSyncSetting?.value
       ? Math.max(0, new Date(lastSyncSetting.value).getTime() - 300000)
       : 0;
@@ -65,17 +79,17 @@ export async function fetchFromCloud() {
       body: JSON.stringify({ type: 'fetch_delta', lastSyncTime, password })
     });
     const remoteEvents = await eventsResponse.json();
-    console.log({ remoteEvents });
+    
     if (remoteEvents.status === 'error') throw new Error(remoteEvents.message);
 
     if (Array.isArray(remoteEvents) && remoteEvents.length > 0) {
-      console.log('Remote data received, items:', remoteEvents.length);
-      const existingEvents = await db.events.toArray();
-      const existingMap = new Map(existingEvents.map(e => [e.syncId, e]));
+      // Get IDs of items currently in the sync queue to avoid overwriting fresh local edits
+      const pendingOperations = await db.syncQueue.toArray();
+      const pendingSyncIds = new Set(pendingOperations.map(op => op.syncId));
 
       const formattedEvents = remoteEvents
         .map(e => {
-          // Robustly find syncId and type regardless of casing
+          // ... mapping logic (same as before)
           const findKey = (obj, key) => {
             const lowerKey = key.toLowerCase();
             const realKey = Object.keys(obj).find(k => k.toLowerCase() === lowerKey);
@@ -86,30 +100,26 @@ export async function fetchFromCloud() {
           const syncId = String(rawSyncId || '');
           if (!syncId) return null;
 
+          // PROTECT: Skip if this item has a pending local edit
+          if (pendingSyncIds.has(syncId)) {
+            console.log(`Skipping cloud update for ${syncId} as it has a pending local edit.`);
+            return null;
+          }
+
           const status = String(findKey(e, 'status') || 'ACTIVE').toUpperCase();
           if (status === 'DELETED') {
             return { syncId, status: 'DELETED', _deleteMe: true };
           }
 
           const type = String(findKey(e, 'type') || '').toLowerCase();
-
-          // Prioritize original event timestamp over sync time (lastupdated)
           let ts = Number(findKey(e, 'timestamp'));
-          if (isNaN(ts) || ts <= 0) {
-            ts = new Date(findKey(e, 'timestamp')).getTime();
-          }
-          if (isNaN(ts) || ts <= 0) {
-            ts = Number(findKey(e, 'lastupdated'));
-          }
-          if (isNaN(ts) || ts <= 0) {
-            ts = new Date(findKey(e, 'lastupdated')).getTime();
-          }
+          if (isNaN(ts) || ts <= 0) ts = new Date(findKey(e, 'timestamp')).getTime();
+          if (isNaN(ts) || ts <= 0) ts = Number(findKey(e, 'lastupdated'));
+          if (isNaN(ts) || ts <= 0) ts = new Date(findKey(e, 'lastupdated')).getTime();
           if (isNaN(ts) || ts <= 0) ts = Date.now();
 
           let et = Number(findKey(e, 'endtime'));
-          if (isNaN(et) || et <= 0) {
-            et = new Date(findKey(e, 'endtime')).getTime();
-          }
+          if (isNaN(et) || et <= 0) et = new Date(findKey(e, 'endtime')).getTime();
           if (isNaN(et) || et <= 0) et = undefined;
 
           return {
@@ -135,10 +145,7 @@ export async function fetchFromCloud() {
       const toPut = formattedEvents.filter(e => !e._deleteMe);
 
       if (toDelete.length > 0) await db.events.bulkDelete(toDelete);
-      if (toPut.length > 0) {
-        console.log(`Putting ${toPut.length} items into local DB`);
-        await db.events.bulkPut(toPut);
-      }
+      if (toPut.length > 0) await db.events.bulkPut(toPut);
     } else {
       console.log('No new data received from cloud.');
     }
@@ -182,5 +189,7 @@ export async function fetchFromCloud() {
   } catch (error) {
     console.error('Fetch from cloud failed:', error);
     return false;
+  } finally {
+    isSyncing = false;
   }
 }

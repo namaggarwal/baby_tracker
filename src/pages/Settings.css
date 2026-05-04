@@ -338,3 +338,19 @@
 .toggle-switch.active .toggle-knob {
   left: 24px;
 }
+
+.settings-footer {
+  margin-top: 48px;
+  margin-bottom: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-footer p {
+  font-size: 12px;
+  color: var(--color-on-surface-variant);
+  font-weight: 500;
+  opacity: 0.6;
+}
