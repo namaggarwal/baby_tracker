@@ -7,21 +7,21 @@
 }
 
 .type-card {
-  background: #f4f7f4;
+  background: var(--color-surface-container-high);
   border-radius: 24px;
   padding: 24px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   border: none;
-  color: #191c1a;
+  color: var(--color-on-surface);
   transition: all 0.2s;
   gap: 12px;
 }
 
 .type-card.active {
   background: #436444; /* Dark green */
-  color: #ffffff;
+  color: var(--color-surface);
 }
 
 .type-icon-wrapper {

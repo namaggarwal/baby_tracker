@@ -89,12 +89,12 @@
 
 .feeding-card {
   background: var(--color-primary-container);
-  color: white;
+  color: var(--color-on-primary-container);
 }
 
 .diaper-card {
   background: var(--color-tertiary);
-  color: white;
+  color: var(--color-on-tertiary);
 }
 
 .card-header {
@@ -334,8 +334,8 @@
 }
 
 .bath-card {
-  background: #8fbcd4;
-  color: white;
+  background: var(--color-teal);
+  color: var(--color-on-primary);
   min-height: auto;
 }
 
@@ -362,5 +362,5 @@
 }
 
 .icon-secondary { color: var(--color-secondary); }
-.icon-primary { color: white; }
-.icon-white { color: white; font-size: 32px !important; }
+.icon-primary { color: var(--color-on-primary-container); }
+.icon-white { color: inherit; font-size: 32px !important; }

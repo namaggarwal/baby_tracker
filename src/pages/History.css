@@ -99,7 +99,7 @@
 
 .delete-log-btn:hover {
   opacity: 1;
-  color: #ba1a1a;
+  color: var(--color-error);
   background: rgba(186, 26, 26, 0.05);
 }
 

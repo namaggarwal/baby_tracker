@@ -1,5 +1,5 @@
 .log-page {
-  background-color: #fdf9f0; /* Match warm cream from mockups */
+  background-color: var(--color-background); /* Match warm cream from mockups */
   min-height: 100vh;
   padding-bottom: 120px;
 }
@@ -16,7 +16,7 @@
 .log-header h2 {
   font-size: 24px;
   font-weight: 600;
-  color: #2e4e30;
+  color: var(--color-primary);
   margin: 0;
 }
 
@@ -29,7 +29,7 @@
 
 .segment-control {
   display: flex;
-  background: #f1f4f0;
+  background: var(--color-surface-container);
   border-radius: 32px;
   padding: 4px;
   margin-bottom: 24px;
@@ -47,8 +47,8 @@
 }
 
 .segment-btn.active {
-  background: #ffffff;
-  color: #2e4e30;
+  background: var(--color-surface);
+  color: var(--color-primary);
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
@@ -62,13 +62,13 @@
 .section-header-row h3, .section-title {
   font-size: 18px;
   font-weight: 600;
-  color: #191c1a;
+  color: var(--color-on-surface);
   margin: 0;
 }
 
 .last-log-tag {
-  background: #cce8ce;
-  color: #2e4e30;
+  background: var(--color-primary-container);
+  color: var(--color-primary);
   padding: 6px 12px;
   border-radius: 16px;
   font-size: 12px;
@@ -82,20 +82,20 @@
 }
 
 .size-card {
-  background: #f4f7f4;
+  background: var(--color-surface-container-high);
   border-radius: 24px;
   padding: 24px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   border: none;
-  color: #191c1a;
+  color: var(--color-on-surface);
   transition: all 0.2s;
 }
 
 .size-card.active {
   background: #436444; /* Dark green */
-  color: #ffffff;
+  color: var(--color-surface);
 }
 
 .baby-icon-placeholder {
@@ -133,7 +133,7 @@
   border-radius: 24px;
   padding: 12px;
   font-size: 16px;
-  color: #424841;
+  color: var(--color-on-surface-variant);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,14 +141,14 @@
 }
 
 .side-btn.active {
-  background: #cce8ce;
-  border-color: #cce8ce;
-  color: #2e4e30;
+  background: var(--color-primary-container);
+  border-color: var(--color-primary-container);
+  color: var(--color-primary);
   font-weight: 600;
 }
 
 .glass-card {
-  background: #f4f7f4;
+  background: var(--color-surface-container-high);
   border-radius: 24px;
   padding: 16px 24px;
   display: flex;
@@ -163,18 +163,18 @@
 
 .time-label {
   font-size: 14px;
-  color: #424841;
+  color: var(--color-on-surface-variant);
 }
 
 .time-value {
   font-size: 20px;
   font-weight: 600;
-  color: #191c1a;
+  color: var(--color-on-surface);
 }
 
 .change-btn {
   background: #e6e9e4;
-  color: #2e4e30;
+  color: var(--color-primary);
   border: none;
   padding: 8px 16px;
   border-radius: 16px;
@@ -188,14 +188,14 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: #f4f7f4;
+  background: var(--color-surface-container-high);
   border-radius: 24px;
   padding: 20px;
 }
 
 .notes-label {
   font-weight: 600;
-  color: #191c1a;
+  color: var(--color-on-surface);
 }
 
 textarea {
@@ -206,7 +206,7 @@ textarea {
   font-size: 16px;
   min-height: 80px;
   outline: none;
-  color: #191c1a;
+  color: var(--color-on-surface);
 }
 
 textarea::placeholder {

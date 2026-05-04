@@ -122,6 +122,30 @@ export default function Settings() {
             </button>
           </div>
         </div>
+
+        <div className="setting-item">
+          <label>Appearance (Dark Mode)</label>
+          <div className="segment-control settings-segment">
+            <button 
+              className={`segment-btn ${(!settings?.theme || settings?.theme === 'system') ? 'active' : ''}`}
+              onClick={() => updateSetting('theme', 'system')}
+            >
+              Auto
+            </button>
+            <button 
+              className={`segment-btn ${settings?.theme === 'light' ? 'active' : ''}`}
+              onClick={() => updateSetting('theme', 'light')}
+            >
+              Light
+            </button>
+            <button 
+              className={`segment-btn ${settings?.theme === 'dark' ? 'active' : ''}`}
+              onClick={() => updateSetting('theme', 'dark')}
+            >
+              Dark
+            </button>
+          </div>
+        </div>
       </section>
 
       <section className="settings-section">

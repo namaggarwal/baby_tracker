@@ -12,11 +12,13 @@ import LogBath from './pages/LogBath';
 import LogTummy from './pages/LogTummy';
 import { ToastProvider } from './context/ToastContext';
 import NotificationManager from './components/NotificationManager';
+import ThemeManager from './components/ThemeManager';
 import './App.css';
 
 function App() {
   return (
     <ToastProvider>
+      <ThemeManager />
       <NotificationManager />
       <BrowserRouter>
         <Routes>

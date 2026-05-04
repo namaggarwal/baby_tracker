@@ -171,7 +171,7 @@
 
 .icon-btn-small.cancel {
   background: #ecefea;
-  color: #ba1a1a;
+  color: var(--color-error);
 }
 
 .icon-btn-small:active {
@@ -184,12 +184,12 @@
 }
 
 .danger-title {
-  color: #ba1a1a !important;
+  color: var(--color-error) !important;
 }
 
 .btn-danger {
-  background-color: #ba1a1a;
-  color: #ffffff;
+  background-color: var(--color-error);
+  color: var(--color-surface);
   padding: 16px;
   font-weight: 600;
   display: flex;
@@ -234,18 +234,18 @@
 }
 
 .danger-text {
-  color: #ba1a1a;
+  color: var(--color-error);
 }
 
 .confirmation-modal h3 {
   font-size: 20px;
   margin-bottom: 12px;
-  color: #191c1a;
+  color: var(--color-on-surface);
 }
 
 .confirmation-modal p {
   font-size: 14px;
-  color: #424841;
+  color: var(--color-on-surface-variant);
   margin-bottom: 24px;
   line-height: 1.5;
 }
@@ -258,7 +258,7 @@
 }
 
 .modal-btn-confirm {
-  background: #ba1a1a;
+  background: var(--color-error);
   color: white;
   border: none;
   padding: 16px;
@@ -270,7 +270,7 @@
 
 .modal-btn-cancel {
   background: #ecefea;
-  color: #191c1a;
+  color: var(--color-on-surface);
   border: none;
   padding: 16px;
   border-radius: 999px;

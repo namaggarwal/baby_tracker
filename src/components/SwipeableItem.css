@@ -3,7 +3,7 @@
   width: 100%;
   overflow: hidden;
   border-radius: var(--radius-lg);
-  background: #ba1a1a;
+  background: var(--color-error);
 }
 
 .swipe-background {

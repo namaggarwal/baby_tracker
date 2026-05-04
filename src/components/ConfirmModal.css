@@ -40,7 +40,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ba1a1a;
+  color: var(--color-error);
   margin-bottom: 20px;
 }
 
@@ -83,7 +83,7 @@
   flex: 1;
   padding: 12px;
   border-radius: var(--radius-pill);
-  background: #ba1a1a;
+  background: var(--color-error);
   color: white;
   font-weight: 600;
   font-size: 14px;

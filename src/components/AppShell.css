@@ -19,7 +19,7 @@
   justify-content: space-around;
   align-items: center;
   z-index: 100;
-  background: #fdf9f0; /* Warm cream */
+  background: var(--color-background); /* Warm cream */
   border-top-left-radius: 32px;
   border-top-right-radius: 32px;
   box-shadow: 0 -4px 24px rgba(0,0,0,0.04);
@@ -80,7 +80,7 @@
 }
 
 .offline-banner {
-  background: #ba1a1a;
+  background: var(--color-error);
   color: white;
   padding: 8px;
   text-align: center;
