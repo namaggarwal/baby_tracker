@@ -2,7 +2,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import QuickAddMenu from './QuickAddMenu';
 import { useToast } from '../context/ToastContext';
-import { fetchFromCloud } from '../utils/sync';
+import { fetchFromCloud, syncToCloud } from '../utils/sync';
 import './AppShell.css';
 
 const POLL_INTERVAL_MS = 30000; // 30 seconds
@@ -15,6 +15,9 @@ export default function AppShell() {
 
   const autoSync = useCallback(async (silent = true) => {
     if (!navigator.onLine) return;
+    // Push pending operations first
+    await syncToCloud();
+    // Then fetch updates
     const success = await fetchFromCloud();
     if (!silent && success) {
       showToast('Synced latest updates!', 'success');

@@ -14,6 +14,9 @@ export async function syncToCloud() {
   }
 
   isSyncing = true;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
   try {
     const passwordSetting = await db.settings.get('syncPassword');
     const password = passwordSetting?.value || '';
@@ -30,6 +33,7 @@ export async function syncToCloud() {
     const res = await fetch(CONFIG.GOOGLE_SHEETS_URL, {
       method: 'POST',
       body: JSON.stringify(payload),
+      signal: controller.signal
     });
 
     const text = await res.text();
@@ -49,6 +53,7 @@ export async function syncToCloud() {
     console.error('Sync failed:', error);
     return false;
   } finally {
+    clearTimeout(timeoutId);
     isSyncing = false;
   }
 }
@@ -64,6 +69,9 @@ export async function fetchFromCloud() {
   }
 
   isSyncing = true;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
   try {
     const passwordSetting = await db.settings.get('syncPassword');
     const password = passwordSetting?.value || '';
@@ -76,7 +84,8 @@ export async function fetchFromCloud() {
 
     const eventsResponse = await fetch(CONFIG.GOOGLE_SHEETS_URL, {
       method: 'POST',
-      body: JSON.stringify({ type: 'fetch_delta', lastSyncTime, password })
+      body: JSON.stringify({ type: 'fetch_delta', lastSyncTime, password }),
+      signal: controller.signal
     });
     const remoteEvents = await eventsResponse.json();
     
@@ -162,7 +171,8 @@ export async function fetchFromCloud() {
         type: 'fetch_settings', 
         password,
         lastSyncTime: lastSettingsSyncTime 
-      })
+      }),
+      signal: controller.signal
     });
     const remoteSettings = await settingsResponse.json();
 
@@ -190,6 +200,7 @@ export async function fetchFromCloud() {
     console.error('Fetch from cloud failed:', error);
     return false;
   } finally {
+    clearTimeout(timeoutId);
     isSyncing = false;
   }
 }
