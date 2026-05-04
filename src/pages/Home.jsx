@@ -3,6 +3,8 @@ import { useEvents } from '../hooks/useEvents';
 import { useSettings } from '../hooks/useSettings';
 import { useNavigate } from 'react-router-dom';
 import { formatTime, formatTimeRange } from '../utils/timeFormat';
+import { fetchFromCloud } from '../utils/sync';
+import { useToast } from '../context/ToastContext';
 import './Home.css';
 
 // Move component outside to prevent remounts on every render
@@ -37,6 +39,20 @@ export default function Home() {
   const babyName = settings?.babyName || 'Tara';
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
   const [activeSuggestion, setActiveSuggestion] = useState('feed');
+  const [isSyncing, setIsSyncing] = useState(false);
+  const { showToast } = useToast();
+
+  const handleSyncNow = async () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    const success = await fetchFromCloud();
+    setIsSyncing(false);
+    if (success) {
+      showToast('Data synced from cloud!');
+    } else {
+      showToast('Sync failed. Check connection.', 'error');
+    }
+  };
 
   // Suggestion rotation
   useEffect(() => {
@@ -117,6 +133,26 @@ export default function Home() {
   const tummyGoal = settings?.tummyGoal || 30;
   const feedGoal = settings?.feedGoal || 8;
   const nappyGoal = settings?.nappyGoal || 6;
+
+  const formatRelativeTime = (timestamp) => {
+    if (!timestamp) return 'Never';
+    const ts = typeof timestamp === 'number' ? timestamp : new Date(timestamp).getTime();
+    if (isNaN(ts)) return 'Never';
+    
+    const diff = Date.now() - ts;
+    
+    // Handle future dates (clock drift) or very recent events
+    if (diff < 30000) return 'Just now';
+    if (diff < 60000) return 'Less than a min ago';
+    
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 60) return `${minutes}m ago`;
+    
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ${minutes % 60}m ago`;
+    
+    return new Date(ts).toLocaleDateString();
+  };
 
   return (
     <div className="container home-page">
@@ -231,7 +267,7 @@ export default function Home() {
                    {event.type === 'sleep' ? (
                      formatTimeRange(event.timestamp, event.endTime, settings?.timeFormat)
                    ) : (
-                     formatTime(event.timestamp, settings?.timeFormat)
+                     formatRelativeTime(event.timestamp)
                    )}
                    {event.type !== 'sleep' && ` • ${
                      event.type === 'feed' ? `${event.quantity_ml}ml ${event.subtype === 'breast' ? 'Breastmilk' : 'Formula'}` 
@@ -252,6 +288,26 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      <footer className="sync-status-footer">
+        <div className="sync-info">
+          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+            {isSyncing ? 'sync' : 'cloud_done'}
+          </span>
+          <span>Last synced: {formatRelativeTime(settings?.lastFetchTime)}</span>
+        </div>
+        <button 
+          className={`sync-now-btn ${isSyncing ? 'spinning' : ''}`} 
+          onClick={handleSyncNow}
+          disabled={isSyncing}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+            {isSyncing ? 'sync' : 'cloud_sync'}
+          </span>
+          {isSyncing ? 'Syncing...' : 'Sync Now'}
+        </button>
+      </footer>
     </div>
   );
 }

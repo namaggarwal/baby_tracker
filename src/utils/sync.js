@@ -66,9 +66,9 @@ export async function fetchFromCloud() {
   try {
     // 1. Fetch Events using POST
     const lastSyncSetting = await db.settings.get('lastFetchTime');
-    // Subtract 1 minute (60,000ms) as a safety buffer to ensure no overlapping updates are missed
+    // Subtract 5 minutes (300000ms) as a safety buffer to ensure no overlapping updates are missed
     const lastSyncTime = lastSyncSetting?.value
-      ? Math.max(0, new Date(lastSyncSetting.value).getTime() - 60000)
+      ? Math.max(0, new Date(lastSyncSetting.value).getTime() - 300000)
       : 0;
 
     const eventsResponse = await fetch(CONFIG.GOOGLE_SHEETS_URL, {
@@ -175,7 +175,7 @@ export async function fetchFromCloud() {
       }
     }
 
-    await db.settings.put({ key: 'lastFetchTime', value: new Date().toISOString() });
+    await db.settings.put({ key: 'lastFetchTime', value: Date.now() });
     return true;
   } catch (error) {
     console.error('Fetch from cloud failed:', error);
