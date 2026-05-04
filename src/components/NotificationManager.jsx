@@ -38,11 +38,15 @@ export default function NotificationManager() {
       }
     };
 
-    const sendNotification = (title, body) => {
-      if (Notification.permission === 'granted') {
-        new Notification(title, {
+    const sendNotification = async (title, body) => {
+      if (Notification.permission === 'granted' && navigator.serviceWorker.ready) {
+        const registration = await navigator.serviceWorker.ready;
+        registration.showNotification(title, {
           body,
-          icon: '/favicon.svg'
+          icon: '/pwa-192x192.png',
+          badge: '/favicon.svg',
+          tag: title.toLowerCase().replace(/\s/g, '-'), // Prevent duplicate notifications
+          renotify: true
         });
       }
     };
