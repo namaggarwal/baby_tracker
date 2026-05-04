@@ -6,9 +6,9 @@
   * **File:** `backend.gs`
   * **Issue:** `handleSyncOperations` fails to update its `rowMap` after appending a new row. If a single sync batch contains multiple operations for the same `syncId` (e.g., CREATE then UPDATE), the backend will duplicate the row instead of updating the newly created one.
 
-- [ ] **2. Broken Timestamp Parsing (Backend)**
-  * **File:** `backend.gs`
-  * **Issue:** The `parseTs` function strips non-numeric characters (`replace(/[^0-9]/g, "")`). This turns string dates (like "2026-05-04 12:00") into massive invalid epoch numbers, breaking the Delta Sync logic entirely.
+- [x] **2. Broken Timestamp Parsing (Backend)**
+  * **File:** `backend.gs` (now `Code.gs`)
+  * **Issue:** FIXED. The logic now handles raw numbers, ISO strings, and formatted strings (commas) robustly.
 
 - [ ] **3. Settings Sync is "Fire and Forget" (Frontend)**
   * **File:** `src/hooks/useSettings.js`

@@ -115,6 +115,24 @@ function handleSyncOperations(ss, data) {
   const now = new Date();
 
   data.operations.forEach(op => {
+    if (op.action === 'SETTINGS_UPDATE') {
+      const sSheet = ss.getSheetByName(SETTINGS_SHEET) || ss.insertSheet(SETTINGS_SHEET).appendRow(['Key', 'Value', 'Lastupdated']).getSheetValues();
+      const sData = sSheet.getDataRange().getValues();
+      const key = op.payload.key;
+      const val = op.payload.value;
+      const luTime = now.getTime();
+      let found = false;
+      for (let i = 1; i < sData.length; i++) {
+        if (String(sData[i][0]) === String(key)) {
+          sSheet.getRange(i + 1, 2, 1, 2).setValues([[val, luTime]]);
+          found = true;
+          break;
+        }
+      }
+      if (!found) sSheet.appendRow([key, val, luTime]);
+      return;
+    }
+
     const rowIndex = rowMap.get(String(op.syncId));
     const existingRow = (rowIndex && rowIndex <= values.length) ? values[rowIndex - 1] : [];
     
@@ -195,28 +213,29 @@ function handleSettings(ss, data) {
   if (!sheet && data.type === 'fetch_settings') return createJsonResponse([]);
 
   if (data.type === 'settings_update') {
-    if (!sheet) {
-       ss.insertSheet(SETTINGS_SHEET).appendRow(['Key', 'Value']);
-    } else {
-       sheet.clear();
-       sheet.appendRow(['Key', 'Value']);
-    }
-    const targetSheet = ss.getSheetByName(SETTINGS_SHEET);
-    Object.keys(data.settings).forEach(key => {
-      targetSheet.appendRow([key, data.settings[key]]);
-    });
-    return createJsonResponse({ status: 'success' });
+    // Legacy support for direct settings_update (if still used)
+    // In new version, this is handled in handleSyncOperations via SETTINGS_UPDATE action
+    return createJsonResponse({ status: 'error', message: 'Use sync_operations for settings updates' });
   } else {
     const sheetData = sheet.getDataRange().getValues();
     if (sheetData.length <= 1) return createJsonResponse([]);
-    const headers = sheetData[0];
+    
+    const headers = sheetData[0].map(h => String(h).toLowerCase().replace(/\s+/g, ''));
+    const luIdx = headers.indexOf('lastupdated');
+    const syncTime = Number(data.lastSyncTime) || 0;
+    
     const rows = sheetData.slice(1);
-    const result = rows.map(row => {
-      let obj = {};
-      headers.forEach((header, i) => {
-        obj[header.toLowerCase()] = row[i];
-      });
-      return obj;
+    const result = [];
+    
+    rows.forEach(row => {
+      const rowLU = luIdx >= 0 ? parseTs(row[luIdx]) : 0;
+      if (syncTime === 0 || rowLU > syncTime) {
+        let obj = {};
+        headers.forEach((header, i) => {
+          obj[header] = row[i];
+        });
+        result.push(obj);
+      }
     });
     return createJsonResponse(result);
   }
@@ -226,14 +245,20 @@ function parseTs(v) {
   if (typeof v === 'number' && v > 0) return v;
   if (!v) return 0;
   
-  // Strip commas and other formatting characters
-  const clean = String(v).replace(/[^0-9]/g, "");
-  const n = Number(clean);
-  if (!isNaN(n) && n > 0) return n;
+  // 1. Try standard numeric parsing (works for "1714838400000")
+  const n = Number(v);
+  if (!isNaN(n) && n > 1000000000) return n; // Ensure it's a large enough number to be a timestamp
   
-  // Fallback for ISO strings or other date formats
+  // 2. Try standard Date parsing (works for "2026-05-04")
   const d = new Date(v).getTime();
-  return isNaN(d) ? 0 : d;
+  if (!isNaN(d) && d > 0) return d;
+  
+  // 3. Fallback: Strip formatting characters (works for "1,714,838,400,000")
+  const clean = String(v).replace(/[^0-9]/g, "");
+  const n2 = Number(clean);
+  if (!isNaN(n2) && n2 > 1000000000) return n2;
+  
+  return 0;
 }
 
 function createJsonResponse(data) {

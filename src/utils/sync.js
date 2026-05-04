@@ -1,24 +1,13 @@
 import { CONFIG } from '../config';
 import { db } from '../db';
 
-export async function syncToCloud(isSettings = false, settingsData = null) {
+export async function syncToCloud() {
   if (!CONFIG.GOOGLE_SHEETS_URL || CONFIG.GOOGLE_SHEETS_URL.includes('REPLACE_WITH_YOUR_URL')) {
     return;
   }
 
   const passwordSetting = await db.settings.get('syncPassword');
   const password = passwordSetting?.value || '';
-
-  if (isSettings && settingsData) {
-    const payload = { type: 'settings_update', settings: settingsData, password };
-    try {
-      await fetch(CONFIG.GOOGLE_SHEETS_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-      return true;
-    } catch (err) { return false; }
-  }
 
   const operations = await db.syncQueue.toArray();
   if (operations.length === 0) return true;
@@ -155,27 +144,40 @@ export async function fetchFromCloud() {
     }
 
     // 2. Fetch Settings using POST for security
+    const lastSettingsSyncSetting = await db.settings.get('lastSettingsFetchTime');
+    const lastSettingsSyncTime = lastSettingsSyncSetting?.value
+      ? Math.max(0, Number(lastSettingsSyncSetting.value) - 300000)
+      : 0;
+
     const settingsResponse = await fetch(CONFIG.GOOGLE_SHEETS_URL, {
       method: 'POST',
-      body: JSON.stringify({ type: 'fetch_settings', password })
+      body: JSON.stringify({ 
+        type: 'fetch_settings', 
+        password,
+        lastSyncTime: lastSettingsSyncTime 
+      })
     });
     const remoteSettings = await settingsResponse.json();
 
     if (remoteSettings.status === 'error') throw new Error(remoteSettings.message);
 
     if (Array.isArray(remoteSettings) && remoteSettings.length > 0) {
+      console.log('Remote settings received, items:', remoteSettings.length);
       for (const item of remoteSettings) {
         let val = item.value;
-        if (val !== null && val !== undefined && !isNaN(val) && val !== '') {
+        // Key-value mapping from the delta result
+        const key = item.key;
+        if (val !== null && val !== undefined && !isNaN(val) && val !== '' && typeof val !== 'boolean') {
           val = Number(val);
         }
-        if (item.key) {
-          await db.settings.put({ key: item.key, value: val });
+        if (key) {
+          await db.settings.put({ key, value: val });
         }
       }
     }
 
     await db.settings.put({ key: 'lastFetchTime', value: Date.now() });
+    await db.settings.put({ key: 'lastSettingsFetchTime', value: Date.now() });
     return true;
   } catch (error) {
     console.error('Fetch from cloud failed:', error);

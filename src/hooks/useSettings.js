@@ -16,13 +16,16 @@ export function useSettings() {
     settings,
     updateSetting: async (key, value) => {
       await db.settings.put({ key, value });
-      // Sync all settings together for consistency
-      const updatedArray = await db.settings.toArray();
-      const allSettings = {};
-      updatedArray.forEach(s => {
-        allSettings[s.key] = s.value;
+      
+      // Add to sync queue instead of direct fire-and-forget sync
+      await db.syncQueue.put({
+        action: 'SETTINGS_UPDATE',
+        syncId: `setting-${key}`,
+        payload: { key, value },
+        timestamp: Date.now()
       });
-      syncToCloud(allSettings, true);
+      
+      syncToCloud();
     },
     resetSettings: async () => {
       // Capture the password to preserve it
