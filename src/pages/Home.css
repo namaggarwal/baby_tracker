@@ -106,6 +106,38 @@
   letter-spacing: 0.5px;
 }
 
+.quick-action-btn {
+  border: none;
+  border-radius: 20px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.quick-action-btn:active {
+  transform: scale(0.95);
+}
+
+.quick-action-btn.sleep {
+  background: #2e4e30;
+  color: #ffffff;
+}
+
+.quick-action-btn.wake {
+  background: #494265;
+  color: #ffffff;
+}
+
+.quick-action-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
 .status-card.is-awake .status-title,
 .status-card.is-awake .status-timer {
   color: #2e4e30;

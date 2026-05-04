@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatTime, formatTimeRange } from '../utils/timeFormat';
 import { fetchFromCloud } from '../utils/sync';
 import { useToast } from '../context/ToastContext';
+import { addEvent, updateEvent } from '../hooks/useEvents';
 import './Home.css';
 
 // Move component outside to prevent remounts on every render
@@ -43,6 +44,32 @@ export default function Home() {
   const [showNotifications, setShowNotifications] = useState(false);
   const { showToast } = useToast();
   const { updateSetting } = useSettings();
+
+  const handleQuickSleepToggle = async (e) => {
+    e.stopPropagation();
+    if (isSleeping) {
+      const now = Date.now();
+      const start = new Date(lastSleep.timestamp);
+      const diffMs = now - start;
+      const hrs = Math.floor(diffMs / (1000 * 60 * 60));
+      const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      const duration = `${hrs}h ${mins}m`;
+
+      await updateEvent(lastSleep.syncId, {
+        endTime: now,
+        duration: duration
+      });
+      showToast('Woke up!');
+    } else {
+      await addEvent({
+        type: 'sleep',
+        timestamp: Date.now(),
+        endTime: null,
+        notes: ''
+      });
+      showToast('Napping started...');
+    }
+  };
 
   const overdueAlerts = useMemo(() => {
     if (!events || !settings) return [];
@@ -255,7 +282,18 @@ export default function Home() {
               <span className="status-title">{babyName} is {isSleeping ? 'sleeping' : 'awake'}</span>
             </div>
           </div>
-          <div className="status-timer">{elapsedTime}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
+            <div className="status-timer">{elapsedTime}</div>
+            <button 
+              className={`quick-action-btn ${isSleeping ? 'wake' : 'sleep'}`}
+              onClick={handleQuickSleepToggle}
+            >
+              <span className="material-symbols-outlined">
+                {isSleeping ? 'sunny' : 'bedtime'}
+              </span>
+              {isSleeping ? 'End Nap' : 'Start Nap'}
+            </button>
+          </div>
         </div>
         <div className="status-footer">
           <span className="material-symbols-outlined" style={{ 
