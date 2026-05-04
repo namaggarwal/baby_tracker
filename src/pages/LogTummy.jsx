@@ -21,14 +21,31 @@ export default function LogTummy() {
   const timerRef = useRef(null);
 
   useEffect(() => {
+    let interval;
     if (isActive) {
-      timerRef.current = setInterval(() => {
-        setSeconds(prev => prev + 1);
-      }, 1000);
-    } else {
-      clearInterval(timerRef.current);
+      // Record the absolute start time (accounting for any existing seconds)
+      const startTime = Date.now() - (seconds * 1000);
+      
+      const updateTimer = () => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        setSeconds(elapsed);
+      };
+
+      interval = setInterval(updateTimer, 1000);
+
+      // Handle phone wake up / tab focus
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          updateTimer();
+        }
+      };
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      
+      return () => {
+        clearInterval(interval);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
     }
-    return () => clearInterval(timerRef.current);
   }, [isActive]);
 
   const formatTimer = (totalSeconds) => {
