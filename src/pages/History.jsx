@@ -96,6 +96,9 @@ export default function History() {
                             : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : 
                               event.type === 'medicine' ? `Medicine: ${event.subtype}` :
                               event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                          {event.synced === false && (
+                            <span className="material-symbols-outlined unsynced-icon" title="Pending sync" style={{ fontSize: '14px', marginLeft: '6px', color: '#9fa8a3', verticalAlign: 'middle' }}>cloud_upload</span>
+                          )}
                         </div>
                       </div>
                       <div className="content-details">

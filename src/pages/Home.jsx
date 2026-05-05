@@ -374,6 +374,9 @@ export default function Home() {
                      : event.type === 'diaper' ? `${event.subtype ? event.subtype.charAt(0).toUpperCase() + event.subtype.slice(1) : 'Wet'} Nappy` : 
                        event.type === 'medicine' ? `Medicine: ${event.subtype}` :
                        event.type.charAt(0).toUpperCase() + event.type.slice(1)}
+                   {event.synced === false && (
+                     <span className="material-symbols-outlined unsynced-icon" title="Pending sync" style={{ fontSize: '14px', marginLeft: '6px', color: '#9fa8a3', verticalAlign: 'middle' }}>cloud_upload</span>
+                   )}
                  </span>
                  <span className="activity-time">
                    {event.type === 'sleep' ? (

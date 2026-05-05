@@ -43,6 +43,17 @@ export async function syncToCloud() {
     if (result.status !== 'error') {
       console.log('Sync operations successful');
       const ids = operations.map(op => op.id);
+      
+      // Mark these events as synced locally so the UI can remove the un-synced indicator
+      const syncIds = [...new Set(operations.map(op => op.syncId))];
+      if (syncIds.length > 0) {
+        const eventsToUpdate = await db.events.where('syncId').anyOf(syncIds).toArray();
+        const updatedEvents = eventsToUpdate.map(e => ({ ...e, synced: true }));
+        if (updatedEvents.length > 0) {
+          await db.events.bulkPut(updatedEvents);
+        }
+      }
+
       await db.syncQueue.bulkDelete(ids);
       await db.settings.put({ key: 'lastSync', value: Date.now() });
       return true;
