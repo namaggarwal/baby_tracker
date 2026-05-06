@@ -44,18 +44,29 @@ export async function syncToCloud() {
       console.log('Sync operations successful');
       const ids = operations.map(op => op.id);
       
-      // Mark these events as synced locally so the UI can remove the un-synced indicator
-      const syncIds = [...new Set(operations.map(op => op.syncId))];
-      if (syncIds.length > 0) {
-        const eventsToUpdate = await db.events.where('syncId').anyOf(syncIds).toArray();
-        const updatedEvents = eventsToUpdate.map(e => ({ ...e, synced: true }));
-        if (updatedEvents.length > 0) {
-          await db.events.bulkPut(updatedEvents);
+      // Mark these events as synced locally using a transaction to avoid race conditions
+      await db.transaction('rw', [db.events, db.syncQueue, db.settings], async () => {
+        // Group by syncId to get the latest version we sent for each item
+        const latestVersionSent = {};
+        for (const op of operations) {
+          if (op.payload && op.payload.version) {
+            latestVersionSent[op.syncId] = Math.max(latestVersionSent[op.syncId] || 0, op.payload.version);
+          }
         }
-      }
 
-      await db.syncQueue.bulkDelete(ids);
-      await db.settings.put({ key: 'lastSync', value: Date.now() });
+        for (const [syncId, version] of Object.entries(latestVersionSent)) {
+          const event = await db.events.get(syncId);
+          // ONLY mark as synced if the version in DB matches exactly what we just sent.
+          // If it's higher, a new local edit happened mid-sync, so leave it as synced: false.
+          if (event && event.version === version) {
+            await db.events.update(syncId, { synced: true });
+          }
+        }
+
+        await db.syncQueue.bulkDelete(ids);
+        await db.settings.put({ key: 'lastSync', value: Date.now() });
+      });
+      
       return true;
     }
     console.warn('Sync operations failed on server:', result.message);
@@ -103,69 +114,72 @@ export async function fetchFromCloud() {
     if (remoteEvents.status === 'error') throw new Error(remoteEvents.message);
 
     if (Array.isArray(remoteEvents) && remoteEvents.length > 0) {
-      // Get IDs of items currently in the sync queue to avoid overwriting fresh local edits
-      const pendingOperations = await db.syncQueue.toArray();
-      const pendingSyncIds = new Set(pendingOperations.map(op => op.syncId));
+      await db.transaction('rw', [db.events, db.syncQueue, db.settings], async () => {
+        // Get IDs of items currently in the sync queue to avoid overwriting fresh local edits
+        // Doing this INSIDE a transaction ensures atomicity
+        const pendingOperations = await db.syncQueue.toArray();
+        const pendingSyncIds = new Set(pendingOperations.map(op => op.syncId));
 
-      const formattedEvents = remoteEvents
-        .map(e => {
-          // ... mapping logic (same as before)
-          const findKey = (obj, key) => {
-            const lowerKey = key.toLowerCase();
-            const realKey = Object.keys(obj).find(k => k.toLowerCase() === lowerKey);
-            return realKey ? obj[realKey] : undefined;
-          };
+        const formattedEvents = remoteEvents
+          .map(e => {
+            const findKey = (obj, key) => {
+              if (!obj) return undefined;
+              const lowerKey = key.toLowerCase();
+              const realKey = Object.keys(obj).find(k => k.toLowerCase() === lowerKey);
+              return realKey ? obj[realKey] : undefined;
+            };
 
-          const rawSyncId = findKey(e, 'syncid') || findKey(e, 'id');
-          const syncId = String(rawSyncId || '');
-          if (!syncId) return null;
+            const rawSyncId = findKey(e, 'syncid') || findKey(e, 'id');
+            const syncId = String(rawSyncId || '');
+            if (!syncId) return null;
 
-          // PROTECT: Skip if this item has a pending local edit
-          if (pendingSyncIds.has(syncId)) {
-            console.log(`Skipping cloud update for ${syncId} as it has a pending local edit.`);
-            return null;
-          }
+            // PROTECT: Skip if this item has a pending local edit
+            if (pendingSyncIds.has(syncId)) {
+              console.log(`Skipping cloud update for ${syncId} as it has a pending local edit.`);
+              return null;
+            }
 
-          const status = String(findKey(e, 'status') || 'ACTIVE').toUpperCase();
-          if (status === 'DELETED') {
-            return { syncId, status: 'DELETED', _deleteMe: true };
-          }
+            const status = String(findKey(e, 'status') || 'ACTIVE').toUpperCase();
+            if (status === 'DELETED') {
+              return { syncId, status: 'DELETED', _deleteMe: true };
+            }
 
-          const type = String(findKey(e, 'type') || '').toLowerCase();
-          let ts = Number(findKey(e, 'timestamp'));
-          if (isNaN(ts) || ts <= 0) ts = new Date(findKey(e, 'timestamp')).getTime();
-          if (isNaN(ts) || ts <= 0) ts = Number(findKey(e, 'lastupdated'));
-          if (isNaN(ts) || ts <= 0) ts = new Date(findKey(e, 'lastupdated')).getTime();
-          if (isNaN(ts) || ts <= 0) ts = Date.now();
+            const type = String(findKey(e, 'type') || '').toLowerCase();
+            let ts = Number(findKey(e, 'timestamp'));
+            if (isNaN(ts) || ts <= 0) ts = new Date(findKey(e, 'timestamp')).getTime();
+            if (isNaN(ts) || ts <= 0) ts = Number(findKey(e, 'lastupdated'));
+            if (isNaN(ts) || ts <= 0) ts = new Date(findKey(e, 'lastupdated')).getTime();
+            if (isNaN(ts) || ts <= 0) ts = Date.now();
 
-          let et = Number(findKey(e, 'endtime'));
-          if (isNaN(et) || et <= 0) et = new Date(findKey(e, 'endtime')).getTime();
-          if (isNaN(et) || et <= 0) et = undefined;
+            let et = Number(findKey(e, 'endtime'));
+            if (isNaN(et) || et <= 0) et = new Date(findKey(e, 'endtime')).getTime();
+            if (isNaN(et) || et <= 0) et = undefined;
 
-          return {
-            syncId,
-            type,
-            subtype: findKey(e, 'subtype') || undefined,
-            timestamp: ts,
-            endTime: et,
-            duration: findKey(e, 'duration') || undefined,
-            notes: findKey(e, 'notes') || undefined,
-            size: findKey(e, 'size') || undefined,
-            quantity_ml: parseInt(findKey(e, 'quantity_ml') || findKey(e, 'quantity')) || undefined,
-            side: findKey(e, 'side') || undefined,
-            dosage: findKey(e, 'dosage') || undefined,
-            status: 'ACTIVE',
-            version: Number(findKey(e, 'version')) || 1,
-            synced: true,
-          };
-        })
-        .filter(e => e !== null);
+            return {
+              syncId,
+              type,
+              subtype: findKey(e, 'subtype') || undefined,
+              timestamp: ts,
+              endTime: et,
+              duration: findKey(e, 'duration') || undefined,
+              notes: findKey(e, 'notes') || undefined,
+              size: findKey(e, 'size') || undefined,
+              quantity_ml: parseInt(findKey(e, 'quantity_ml') || findKey(e, 'quantity')) || undefined,
+              side: findKey(e, 'side') || undefined,
+              dosage: findKey(e, 'dosage') || undefined,
+              status: 'ACTIVE',
+              version: Number(findKey(e, 'version')) || 1,
+              synced: true,
+            };
+          })
+          .filter(e => e !== null);
 
-      const toDelete = formattedEvents.filter(e => e._deleteMe).map(e => e.syncId);
-      const toPut = formattedEvents.filter(e => !e._deleteMe);
+        const toDelete = formattedEvents.filter(e => e._deleteMe).map(e => e.syncId);
+        const toPut = formattedEvents.filter(e => !e._deleteMe);
 
-      if (toDelete.length > 0) await db.events.bulkDelete(toDelete);
-      if (toPut.length > 0) await db.events.bulkPut(toPut);
+        if (toDelete.length > 0) await db.events.bulkDelete(toDelete);
+        if (toPut.length > 0) await db.events.bulkPut(toPut);
+      });
     } else {
       console.log('No new data received from cloud.');
     }
