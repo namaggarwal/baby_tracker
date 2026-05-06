@@ -108,13 +108,26 @@ export default function Home() {
 
   const handleSyncNow = async () => {
     if (isSyncing) return;
+    if (!navigator.onLine) {
+      showToast('You are offline. Cannot sync.', 'error');
+      return;
+    }
+    
     setIsSyncing(true);
-    const success = await fetchFromCloud();
-    setIsSyncing(false);
-    if (success) {
-      showToast('Data synced from cloud!');
-    } else {
-      showToast('Sync failed. Check connection.', 'error');
+    try {
+      // Full sync: Push then Pull
+      await syncToCloud();
+      const success = await fetchFromCloud();
+      if (success) {
+        showToast('Sync complete!');
+      } else {
+        showToast('Sync failed. Check connection.', 'error');
+      }
+    } catch (err) {
+      console.error('Manual sync error:', err);
+      showToast('Sync encountered an error.', 'error');
+    } finally {
+      setIsSyncing(false);
     }
   };
 

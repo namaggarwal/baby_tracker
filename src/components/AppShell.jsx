@@ -34,7 +34,7 @@ export default function AppShell() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        autoSync(false);
+        autoSync(true);
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
